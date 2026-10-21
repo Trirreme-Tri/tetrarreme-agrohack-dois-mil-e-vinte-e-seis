@@ -131,9 +131,9 @@ Com confiança `insuficiente`, não exibir número de dias: dizer que não há h
   UUID da movimentação. Pull incremental por cursor. Sem conflitos de edição (append-only).
 - **Backend:** Node + TypeScript com **Hono** (roda em Node e em Cloudflare Workers sem reescrita).
   Responsabilidades: receber/servir movimentações. Não analisa.
-- **Banco:** PostgreSQL gerenciado (Neon recomendado; decisão final em `docs/DECISOES.md`).
-  Conexão por `DATABASE_URL` em variável de ambiente, nunca no código.
-- **Hospedagem:** frontend no Cloudflare Pages; backend a definir (Cloudflare Workers, Render ou Railway).
+- **Banco:** PostgreSQL no Neon. Conexão via `DATABASE_URL` (secret), usando o driver
+  serverless do Neon (`@neondatabase/serverless`), compatível com Workers.
+- **Hospedagem:** Frontend no Cloudflare Pages; backend no Cloudflare Workers.
 - **Testes:** Vitest em todo o projeto (motor de análise obrigatório).
 - **Estrutura:** monorepo com `web/` (PWA + motor de análise) e `api/` (sincronização).
 
