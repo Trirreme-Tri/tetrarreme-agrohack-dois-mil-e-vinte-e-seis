@@ -3,30 +3,54 @@
 > Atualizado pelo Claude Code ao fim de cada sessão. Enviado ao Projeto do claude.ai para revisão.
 
 ## Última atualização
-21/10/2026
+21/10/2026 — Sessão 2 (status, decisão de infraestrutura e motor de análise)
 
 ## Feito nesta sessão
-- Estrutura inicial criada
-- Corrigida inconsistência no CLAUDE.md (caminho de `config.ts` na seção 6)
+- Pendências registradas neste arquivo.
+- Decisão de infraestrutura: Neon + Cloudflare Workers (`docs/DECISOES.md` e `CLAUDE.md`, seção 7).
+- Projeto `web/` criado (Vite + React + TypeScript, template sem telas) com Vitest (`npm test`).
+- Motor de análise em `web/src/analise/`, TypeScript puro, sem UI, rede ou banco:
+  - `tipos.ts`, `config.ts` (todos os limites provisórios), `datas.ts`, `unidades.ts` (R1);
+  - `produtos.ts` (canônico, apelidos, sugestão de duplicidade, R8);
+  - `importacao.ts` (CSV com mapeamento de colunas configurável, ausentes → `null`, origem, pseudonimização; R2, R7);
+  - `consumo.ts` (saldo por lote, consumo médio, cobertura, confiança na análise; R3);
+  - `detectores/` (os 10 tipos da seção 6, um arquivo cada), `mensagens.ts` (R4), `financeiro.ts` (R2);
+  - `analisar.ts`: `analisar(movimentacoes, produtos, hoje, opcoes?)` pura e determinística; ordena alertas (R5); recalcula tudo a cada chamada (R6).
+- Base simulada em `data/simulados/`: `movimentacoes.csv` (720 movimentações, 21 produtos, 8 categorias),
+  `SITUACOES.md` (12 situações plantadas cobrindo os 10 tipos + 9 produtos normais) e o gerador
+  determinístico `web/scripts/gerar-simulados.ts`.
+- Testes em `web/test/`: conformidade (R1–R8), detecção guiada por `SITUACOES.md`, falsos positivos,
+  reanálise e testes unitários dos limites de cada detector.
+- README: tabela de tecnologias/licenças e linha de uso do Claude Code.
+
+## Testes
+`npm test` em `web/`: **72 testes, 72 passaram** (3 arquivos: `conformidade.test.ts`, `deteccao.test.ts`, `motor.test.ts`).
+Também passam `tsc -b`, `oxlint` e `vite build`.
 
 ## Decisões tomadas
-- Arquivo de limites dos alertas fica em `web/src/analise/config.ts` (registrado em `docs/DECISOES.md`)
+- Banco Neon; backend Cloudflare Workers com Hono.
+- Interpretações da especificação no motor, todas registradas em `docs/DECISOES.md` (21/10/2026). Principais:
+  níveis de cada tipo de alerta; limites adicionais provisórios em `config.ts` (horizonte de vencimento,
+  janela da retirada atípica, piso do MAD, regras da variação de preço); definição do `valorEnvolvido` de
+  cada tipo; consumo de lotes por validade (FEFO); número ausente compatível na duplicidade.
 
 ## Regras R1–R8: situação
 | Regra | Implementada | Testada |
 |---|---|---|
-| R1 | Não | Não |
-| R2 | Não | Não |
-| R3 | Não | Não |
-| R4 | Não | Não |
-| R5 | Não | Não |
-| R6 | Não | Não |
-| R7 | Não | Não |
-| R8 | Não | Não |
+| R1 | Sim — `unidades.ts`, conversão em saldo, consumo, preço e importação | Sim |
+| R2 | Sim — `importacao.ts` (ausentes → `null`), `financeiro.ts` (itens sem preço), `fmtReais` ("sem preço") | Sim |
+| R3 | Sim — `calcularConfianca` na análise; mensagens sem dias com confiança insuficiente | Sim |
+| R4 | Sim — alerta estruturado; `gerarMensagem` monta a mensagem a partir dos campos | Sim |
+| R5 | Sim — `ordenarAlertas` (nível, depois maior valor envolvido) | Sim |
+| R6 | Sim — `analisar` puro, sem persistência; `hoje` é parâmetro | Sim |
+| R7 | Sim — toda movimentação aponta para uma `importacao` com origem; `analisar` recusa movimentação sem importação e informa `origens`. Falta a UI mostrar a origem | Sim (motor) |
+| R8 | Sim — `produtos.ts`: sugestão sem unificação automática, alerta de duplicidade, recusa de números diferentes | Sim |
 
 ## Apoio de IA nesta sessão
-- Claude Code criou a estrutura inicial a partir de arquivos preparados no Projeto do claude.ai
-- Claude Code identificou e corrigiu a inconsistência de caminho do `config.ts` no CLAUDE.md
+- Claude Code escreveu todo o código do motor de análise, a base simulada, o gerador e os testes,
+  a partir do `CLAUDE.md` e das instruções da sessão 2 preparadas no Projeto do claude.ai.
+- Claude Code registrou as decisões de interpretação em `docs/DECISOES.md` e atualizou o README.
+- Pendente: revisão humana do código e dos limites (coluna "Revisão pela equipe" do README).
 
 ## Pendências e bloqueios
 - Base oficial de dados: não divulgada pela organização; formato desconhecido.
@@ -34,4 +58,8 @@
 - Limites dos alertas (`web/src/analise/config.ts`): provisórios, aguardando calibração do Victor.
 - Provisionamento: conta Neon e conta Cloudflare a cargo do Leonardo (variáveis de ambiente
   serão fornecidas como secrets do Codespaces, nunca commitadas).
-
+- Nomes de produtos da base simulada: o texto do Anexo III não estava disponível nesta sessão;
+  foram usados nomes comuns de insumos para cada categoria. Conferir com o anexo.
+- Para o Victor: níveis de cada alerta, prazo de devolução de embalagem (provisório: 365 dias da
+  compra) e se adubos sazonais (usados uma vez por safra) devem ficar fora do alerta de item parado.
+- Próximas prioridades (CLAUDE.md, seção 9): painel do dono, tela do funcionário, sincronização.
