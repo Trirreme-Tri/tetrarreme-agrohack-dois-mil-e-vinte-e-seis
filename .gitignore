@@ -1,0 +1,23 @@
+# Credenciais e dados da inscrição — nunca versionar
+*comprovante*
+a88b8d95-*.txt
+.env
+.env.*
+
+# Base oficial: só versionar após as orientações de compartilhamento da organização
+data/oficial/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+dist/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
