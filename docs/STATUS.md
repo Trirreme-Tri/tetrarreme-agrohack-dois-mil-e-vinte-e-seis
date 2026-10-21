@@ -29,5 +29,9 @@
 - Claude Code identificou e corrigiu a inconsistência de caminho do `config.ts` no CLAUDE.md
 
 ## Pendências e bloqueios
--
+- Base oficial de dados: não divulgada pela organização; formato desconhecido.
+- Prazo de entrega do repositório: não divulgado.
+- Limites dos alertas (`web/src/analise/config.ts`): provisórios, aguardando calibração do Victor.
+- Provisionamento: conta Neon e conta Cloudflare a cargo do Leonardo (variáveis de ambiente
+  serão fornecidas como secrets do Codespaces, nunca commitadas).
 
