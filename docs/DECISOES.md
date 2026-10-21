@@ -8,4 +8,5 @@
 | _pendente_ | Banco: Neon ou Supabase | Comparação em andamento |
 | _pendente_ | Backend: Cloudflare Workers, Render ou Railway | Comparação em andamento |
 | 21/10/2026 | Movimentações append-only com UUID gerado no cliente | Sincronização idempotente e sem conflitos de edição |
+| 21/10/2026 | CLAUDE.md seção 6: caminho do arquivo de limites corrigido de `src/analise/config.ts` para `web/src/analise/config.ts` | Alinhar com a seção 7, que coloca o motor de análise em `web/src/analise/` |
 

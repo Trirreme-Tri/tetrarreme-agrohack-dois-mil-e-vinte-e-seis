@@ -102,7 +102,7 @@ Exemplo de mensagem (edital): "Estoque crítico: mantendo o consumo médio recen
 poderá ser suficiente por aproximadamente 8 dias."
 
 Tipos e regras iniciais. **Todos os limites são PROVISÓRIOS** e ficam em um único arquivo de
-configuração (`src/analise/config.ts`), para calibração com o Victor:
+configuração (`web/src/analise/config.ts`), para calibração com o Victor:
 
 | Tipo | Regra inicial |
 |---|---|
