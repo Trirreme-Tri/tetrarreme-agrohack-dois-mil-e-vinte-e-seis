@@ -27,6 +27,7 @@ export function evidenciaConsumo(a: AnaliseProduto): Record<string, number | nul
     janelaConsumoDias: a.diasJanela,
     coberturaDias: a.confianca === 'insuficiente' || a.cobertura === null ? null : Math.floor(a.cobertura),
     totalSaidas: a.totalSaidas,
+    saidasNaJanela: a.saidasNaJanela,
     diasHistorico: a.diasHistorico,
   }
 }

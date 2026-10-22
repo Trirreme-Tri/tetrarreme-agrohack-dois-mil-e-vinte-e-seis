@@ -49,6 +49,8 @@ export interface AnaliseProduto {
   cobertura: number | null
   confianca: Confianca
   totalSaidas: number
+  /** Saídas dentro da janela usada no consumo médio: é o que a confiança conta (R3). */
+  saidasNaJanela: number
   diasHistorico: number
   primeiraMovimentacao: string | null
   primeiraEntrada: string | null
@@ -72,13 +74,14 @@ export function precoBase(m: Movimentacao, produto: Produto): number | null {
 }
 
 export function calcularConfianca(
-  totalSaidas: number,
+  /** Saídas dentro da janela de consumo (não o histórico inteiro). */
+  saidasNaJanela: number,
   diasHistorico: number,
   c: Limites['confianca'],
 ): Confianca {
-  if (totalSaidas < c.saidasInsuficiente) return 'insuficiente'
-  if (totalSaidas < c.saidasBaixa || diasHistorico < c.historicoMinimoDias) return 'baixa'
-  if (totalSaidas < c.saidasMedia) return 'media'
+  if (saidasNaJanela < c.saidasInsuficiente) return 'insuficiente'
+  if (saidasNaJanela < c.saidasBaixa || diasHistorico < c.historicoMinimoDias) return 'baixa'
+  if (saidasNaJanela < c.saidasMedia) return 'media'
   return 'alta'
 }
 
@@ -171,9 +174,8 @@ export function analisarProduto(
   const primeiraMovimentacao = movs[0]?.data ?? null
   const diasHistorico = primeiraMovimentacao === null ? 0 : hojeDia - diaDe(primeiraMovimentacao)
   const diasJanela = Math.max(1, Math.min(limites.janelaConsumoDias, diasHistorico))
-  const consumoJanela = saidas
-    .filter((s) => hojeDia - diaDe(s.data) < diasJanela)
-    .reduce((t, s) => t + s.quantidade, 0)
+  const saidasJanela = saidas.filter((s) => hojeDia - diaDe(s.data) < diasJanela)
+  const consumoJanela = saidasJanela.reduce((t, s) => t + s.quantidade, 0)
   const consumoDiario = consumoJanela / diasJanela
   const cobertura = consumoDiario > 0 ? Math.max(saldo, 0) / consumoDiario : null
 
@@ -193,8 +195,9 @@ export function analisarProduto(
     consumoDiario,
     diasJanela,
     cobertura,
-    confianca: calcularConfianca(saidas.length, diasHistorico, limites.confianca),
+    confianca: calcularConfianca(saidasJanela.length, diasHistorico, limites.confianca),
     totalSaidas: saidas.length,
+    saidasNaJanela: saidasJanela.length,
     diasHistorico,
     primeiraMovimentacao,
     primeiraEntrada: movs.find((m) => m.tipo === 'entrada')?.data ?? null,

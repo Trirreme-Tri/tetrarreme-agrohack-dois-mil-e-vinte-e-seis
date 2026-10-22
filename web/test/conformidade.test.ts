@@ -163,12 +163,27 @@ describe('R3 — pouco histórico comunica incerteza', () => {
   test('R3: a confiança é recalculada na análise conforme o histórico cresce', () => {
     const p = produto({ id: 'diesel', unidade_base_id: 'L' })
     const entrada = mov({ produto_id: 'diesel', tipo: 'entrada', quantidade: 5000, unidade_id: 'L', data: '2026-06-01' })
-    const saidas = retiradasPeriodicas('diesel', '2026-10-19', 12, 7, 100, 'L')
-    const confianca = (n: number) => analisar([entrada, ...saidas.slice(0, n)], [p], HOJE).produtos[0].confianca
+    // 15 retiradas a cada 4 dias: todas dentro da janela de 60 dias; usa as `n` mais recentes.
+    const saidas = retiradasPeriodicas('diesel', '2026-10-19', 15, 4, 100, 'L')
+    const confianca = (n: number) => analisar([entrada, ...saidas.slice(-n)], [p], HOJE).produtos[0].confianca
     expect(confianca(2)).toBe('insuficiente')
     expect(confianca(4)).toBe('baixa')
     expect(confianca(8)).toBe('media')
     expect(confianca(12)).toBe('alta')
+  })
+
+  test('R3: a confiança conta só as saídas da janela de consumo, não o histórico inteiro', () => {
+    const p = produto({ id: 'npk', categoria: 'Fertilizantes' })
+    const entrada = mov({ produto_id: 'npk', tipo: 'entrada', quantidade: 9000, data: '2025-10-25' })
+    // 20 retiradas antigas (fora da janela de 60 dias) e 1 recente.
+    const antigas = retiradasPeriodicas('npk', '2026-03-30', 20, 3, 100)
+    const recente = mov({ produto_id: 'npk', tipo: 'saida', quantidade: 100, data: '2026-10-15' })
+    const a = analisar([entrada, ...antigas, recente], [p], HOJE).produtos[0]
+    expect(a.totalSaidas).toBe(21)
+    expect(a.saidasNaJanela).toBe(1)
+    expect(a.confianca).toBe('insuficiente')
+    expect(a.cobertura).not.toBeNull() // há consumo, mas sem histórico recente suficiente: não se exibe estimativa
+    expect(analisar([entrada, ...antigas, recente], [p], HOJE).alertas.filter((x) => x.evidencia.coberturaDias !== undefined && x.evidencia.coberturaDias !== null)).toEqual([])
   })
 
   test('R3: com confiança insuficiente, o alerta não mostra número de dias', () => {
