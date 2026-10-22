@@ -1,0 +1,12 @@
+{
+  "name": "tetrarreme-agrohack",
+  "private": true,
+  "workspaces": [
+    "contrato",
+    "web"
+  ],
+  "scripts": {
+    "test": "npm test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  }
+}
