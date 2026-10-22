@@ -54,22 +54,43 @@ function levenshtein(a: string, b: string): number {
   return linha[b.length]
 }
 
-/** Semelhança entre 0 e 1 das palavras dos nomes (ignora números). */
-export function similaridadeNomes(a: string, b: string): number {
-  const pa = palavrasDoNome(a)
-  const pb = palavrasDoNome(b)
-  if (pa.size === 0 || pb.size === 0) return 0
-  const comuns = [...pa].filter((p) => pb.has(p)).length
-  const jaccard = comuns / (pa.size + pb.size - comuns)
-  // Tolera erros de digitação ("Glifozato" × "Glifosato").
-  const ta = [...pa].sort().join(' ')
-  const tb = [...pb].sort().join(' ')
-  const edicao = 1 - levenshtein(ta, tb) / Math.max(ta.length, tb.length)
-  return Math.max(jaccard, edicao)
+/** Critério de semelhança de nomes (vem de `config.duplicidade`). */
+export interface CriterioDuplicidade {
+  similaridadeMinima: number
+  similaridadePalavra: number
 }
 
-export function parecemMesmoProduto(a: string, b: string, similaridadeMinima: number): boolean {
-  return numerosCompativeis(a, b) && similaridadeNomes(a, b) >= similaridadeMinima
+/** Palavras iguais, ou parecidas o bastante para ser erro de digitação ("glifozato" × "glifosato"). */
+function palavrasSemelhantes(x: string, y: string, similaridadePalavra: number): boolean {
+  if (x === y) return true
+  const maior = Math.max(x.length, y.length)
+  if (maior < 5) return false
+  return 1 - levenshtein(x, y) / maior >= similaridadePalavra
+}
+
+/**
+ * Semelhança entre 0 e 1 dos nomes (ignora números): fração de palavras em comum,
+ * contando como iguais as palavras com pequena diferença de digitação.
+ * "Calcário calcítico" × "Calcário dolomítico" = 1/3 (só "calcário" em comum).
+ */
+export function similaridadeNomes(a: string, b: string, similaridadePalavra = 0.8): number {
+  const pa = [...palavrasDoNome(a)]
+  const pb = [...palavrasDoNome(b)]
+  if (pa.length === 0 || pb.length === 0) return 0
+  const usadas = new Set<number>()
+  let comuns = 0
+  for (const x of pa) {
+    const j = pb.findIndex((y, k) => !usadas.has(k) && palavrasSemelhantes(x, y, similaridadePalavra))
+    if (j >= 0) {
+      usadas.add(j)
+      comuns++
+    }
+  }
+  return comuns / (pa.length + pb.length - comuns)
+}
+
+export function parecemMesmoProduto(a: string, b: string, criterio: CriterioDuplicidade): boolean {
+  return numerosCompativeis(a, b) && similaridadeNomes(a, b, criterio.similaridadePalavra) >= criterio.similaridadeMinima
 }
 
 export interface SugestaoDuplicidade {
@@ -81,18 +102,18 @@ export interface SugestaoDuplicidade {
 /** Pares de produtos cadastrados que parecem ser o mesmo. Apenas sugere. */
 export function sugerirDuplicidades(
   produtos: readonly Produto[],
-  similaridadeMinima: number,
+  criterio: CriterioDuplicidade,
 ): SugestaoDuplicidade[] {
   const sugestoes: SugestaoDuplicidade[] = []
   for (let i = 0; i < produtos.length; i++) {
     for (let j = i + 1; j < produtos.length; j++) {
       const a = produtos[i]
       const b = produtos[j]
-      if (parecemMesmoProduto(a.nome_canonico, b.nome_canonico, similaridadeMinima)) {
+      if (parecemMesmoProduto(a.nome_canonico, b.nome_canonico, criterio)) {
         sugestoes.push({
           produtoA: a,
           produtoB: b,
-          similaridade: similaridadeNomes(a.nome_canonico, b.nome_canonico),
+          similaridade: similaridadeNomes(a.nome_canonico, b.nome_canonico, criterio.similaridadePalavra),
         })
       }
     }
@@ -120,11 +141,10 @@ export function resolverProduto(
 export function sugerirProdutos(
   nome: string,
   produtos: readonly Produto[],
-  similaridadeMinima: number,
+  criterio: CriterioDuplicidade,
 ): Produto[] {
-  return produtos
-    .filter((p) => parecemMesmoProduto(nome, p.nome_canonico, similaridadeMinima))
-    .sort((a, b) => similaridadeNomes(nome, b.nome_canonico) - similaridadeNomes(nome, a.nome_canonico))
+  const sim = (p: Produto) => similaridadeNomes(nome, p.nome_canonico, criterio.similaridadePalavra)
+  return produtos.filter((p) => parecemMesmoProduto(nome, p.nome_canonico, criterio)).sort((a, b) => sim(b) - sim(a))
 }
 
 export class ErroUnificacao extends Error {

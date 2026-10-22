@@ -39,7 +39,12 @@ export interface ConfigAnalise {
     /** Só avalia a última compra se ela tiver sido feita nestes últimos dias. */
     janelaDias: number
   }
-  duplicidade: { similaridadeMinima: number }
+  duplicidade: {
+    /** Fração mínima de palavras em comum entre os nomes (Jaccard). */
+    similaridadeMinima: number
+    /** Duas palavras contam como iguais a partir desta semelhança (tolera erro de digitação). */
+    similaridadePalavra: number
+  }
   devolucaoEmbalagem: { categoria: string; prazoDias: number }
   /** Dias de consumo usados para estimar o valor de reposição (estoque crítico e ruptura). */
   diasReposicao: number
@@ -66,7 +71,7 @@ export const CONFIG_PADRAO: ConfigAnalise = {
   excesso: { coberturaMinimaDias: 180 },
   itemParado: { fracaoTopValor: 0.2, diasSemSaida: 60 },
   variacaoPreco: { variacaoMinima: 0.2, minimoComprasAnteriores: 2, janelaDias: 60 },
-  duplicidade: { similaridadeMinima: 0.6 },
+  duplicidade: { similaridadeMinima: 0.6, similaridadePalavra: 0.8 },
   // Prazo legal usual: até 1 ano da compra. A confirmar com o Victor.
   devolucaoEmbalagem: { categoria: 'Defensivos e biológicos', prazoDias: 365 },
   diasReposicao: 30,

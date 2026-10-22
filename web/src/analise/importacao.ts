@@ -2,6 +2,7 @@
 // R2: valores ausentes viram `null`, nunca 0. R7: toda linha pertence a uma importação com origem.
 import { CONFIG_PADRAO } from './config.ts'
 import { normalizarNome, resolverProduto, sugerirProdutos } from './produtos.ts'
+import type { CriterioDuplicidade } from './produtos.ts'
 import { CATEGORIAS, ImportacaoSchema, MovimentacaoSchema, ProdutoSchema, descreverErros } from '@tetrarreme/contrato'
 import type { Categoria, Movimentacao, Origem, Produto, ProdutoAlias, TipoMovimentacao, Importacao } from '@tetrarreme/contrato'
 import { UNIDADE_BASE_POR_DIMENSAO, converter, identificarUnidade, obterUnidade } from './unidades.ts'
@@ -44,7 +45,8 @@ export interface OpcoesImportacao {
   pseudonimizar?: boolean
   /** Gera os ids (UUID, exigido pelo contrato para movimentações). */
   gerarId?: () => string
-  similaridadeMinima?: number
+  /** Critério para sugerir unificação de nomes novos (padrão: `CONFIG_PADRAO.duplicidade`). */
+  duplicidade?: CriterioDuplicidade
 }
 
 export interface ErroImportacao {
@@ -176,7 +178,7 @@ export function importarCsv(texto: string, opcoes: OpcoesImportacao): ResultadoI
     separadorDecimal = ',',
     pseudonimizar = true,
     gerarId = () => crypto.randomUUID(),
-    similaridadeMinima = CONFIG_PADRAO.duplicidade.similaridadeMinima,
+    duplicidade = CONFIG_PADRAO.duplicidade,
   } = opcoes
   if (origem !== 'simulado' && origem !== 'oficial') {
     throw new Error('Toda importação precisa de origem "simulado" ou "oficial" (R7).')
@@ -275,7 +277,7 @@ export function importarCsv(texto: string, opcoes: OpcoesImportacao): ResultadoI
       if (!movimentacao.success) throw new Error(descreverErros(movimentacao.error))
 
       if (!existente) {
-        const candidatos = sugerirProdutos(nome, existentes, similaridadeMinima)
+        const candidatos = sugerirProdutos(nome, existentes, duplicidade)
         if (candidatos.length > 0) {
           resultado.sugestoesUnificacao.push({
             nomeNovo: nome,
