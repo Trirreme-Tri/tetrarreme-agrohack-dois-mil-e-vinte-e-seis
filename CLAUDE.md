@@ -51,7 +51,7 @@ de embalagem vazia de defensivo; tempo de armazenamento de sementes; baixa fraci
 | R4 | Todo alerta tem justificativa compreensível | Alerta é um objeto estruturado (ver seção 6). Nenhum campo obrigatório vazio. A mensagem é gerada dos campos. |
 | R5 | Alertas priorizados | Três níveis: `critico`, `atencao`, `informativo`. Ordem dentro do nível: maior valor financeiro envolvido. |
 | R6 | Atualização → reanálise | Alertas **não são persistidos como verdade**: são sempre recalculados a partir das movimentações. |
-| R7 | Dados simulados identificados | Toda movimentação pertence a uma `importacao` com `origem: "simulado" \| "oficial"`. A UI mostra a origem. A demonstração usa a base oficial. |
+| R7 | Dados simulados identificados | Toda movimentação pertence a uma `importacao` com `origem: "simulado" \| "oficial"`. A UI mostra a origem. A demonstração usa a base simulada, sempre identificada como SIMULADA. |
 | R8 | Produtos com nomes diferentes | Produto canônico + tabela de apelidos. A unificação é **sugerida** automaticamente e **confirmada** por humano. Nunca unificar quando os números diferem (ex.: `NPK 04-14-08` ≠ `NPK 04-30-16`). Possível duplicidade gera alerta. |
 
 ### Conduta (seções 6, 7 e 10 do edital)
@@ -180,7 +180,8 @@ Com confiança `insuficiente`, não exibir número de dias: dizer que não há h
 
 ## 12. Pendências externas
 
-- Base oficial de dados: **não divulgada**. Formato desconhecido.
+- Base oficial de dados: Organização não fornecerá a base; confirmação formal pendente.
+  O importador mantém o mapeamento de colunas configurável (a base pode surgir tarde).
 - Prazo de entrega do repositório: não divulgado.
 - Limites dos alertas: aguardando calibração do Victor.
 
