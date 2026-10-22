@@ -2,7 +2,7 @@ import { diaDe } from '../datas.ts'
 import { arred } from '../formatacao.ts'
 import type { AlertaSemMensagem } from '../mensagens.ts'
 import type { Detector } from './comum.ts'
-import { evidenciaBase, valor } from './comum.ts'
+import { evidenciaBase, limiteUsado, valor } from './comum.ts'
 
 export function mediana(valores: readonly number[]): number {
   const v = [...valores].sort((a, b) => a - b)
@@ -26,6 +26,7 @@ export const detectarRetiradaAtipica: Detector = ({ analises, hojeDia }) =>
       const mad = Math.max(mediana(anteriores.map((x) => Math.abs(x - med))), c.madMinimoFracaoMediana * med)
       const limite = med + c.multiplicadorMad * mad
       if (s.quantidade <= limite) return
+      const usado = limiteUsado(a, 'retiradaAtipica.multiplicadorMad', 'retiradaAtipica.minimoSaidas')
       alertas.push({
         tipo: 'retirada_atipica',
         nivel: 'atencao',
@@ -38,8 +39,9 @@ export const detectarRetiradaAtipica: Detector = ({ analises, hojeDia }) =>
           mad: arred(mad),
           limite: arred(limite),
           retiradasAnteriores: anteriores.length,
+          origemLimite: usado.origemLimite,
         },
-        regra: `Retirada maior que a mediana + ${c.multiplicadorMad} × o desvio típico (MAD) das ${anteriores.length} retiradas anteriores.`,
+        regra: usado.regra(`Retirada maior que a mediana + ${c.multiplicadorMad} × o desvio típico (MAD) das ${anteriores.length} retiradas anteriores.`),
         confianca: a.confianca,
         recomendacao: 'Conferir com o responsável pela retirada se a quantidade está correta e qual foi o destino.',
         valorEnvolvido: valor(s.quantidade, a.precoMedio),

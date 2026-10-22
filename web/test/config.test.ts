@@ -2,7 +2,7 @@
 import { CATEGORIAS } from '@tetrarreme/contrato'
 import { describe, expect, test } from 'vitest'
 import { analisar } from '../src/analise/analisar.ts'
-import { CONFIG_PADRAO, resolverLimites } from '../src/analise/config.ts'
+import { CONFIG_PADRAO, limitesPara } from '../src/analise/config.ts'
 import type { ConfigAnalise } from '../src/analise/config.ts'
 import { HOJE_SIMULADO, carregarBaseSimulada } from './apoio.ts'
 
@@ -19,15 +19,15 @@ describe('Configuração em três níveis', () => {
     expect(Object.keys(CONFIG_PADRAO.porCategoria).sort()).toEqual([...CATEGORIAS].sort())
     for (const ajuste of Object.values(CONFIG_PADRAO.porCategoria)) expect(ajuste).toEqual({})
     expect(CONFIG_PADRAO.porProduto).toEqual({})
-    for (const c of CATEGORIAS) expect(resolverLimites({ nome_canonico: 'x', categoria: c })).toEqual(CONFIG_PADRAO.padrao)
+    for (const c of CATEGORIAS) expect(limitesPara({ nome_canonico: 'x', categoria: c }).valores).toEqual(CONFIG_PADRAO.padrao)
   })
 
   test('a categoria sobrepõe o padrão só no que define, mantendo os demais campos do grupo', () => {
     const config = comAjustes({ porCategoria: { Fertilizantes: { rupturaPrevista: { coberturaMaximaDias: 45 } } }, porProduto: {} })
-    const limites = resolverLimites(fertilizante, config)
+    const limites = limitesPara(fertilizante, config).valores
     expect(limites.rupturaPrevista).toEqual({ coberturaMinimaDias: 7, coberturaMaximaDias: 45 })
     expect(limites.excesso).toEqual(CONFIG_PADRAO.padrao.excesso)
-    expect(resolverLimites(combustivel, config)).toEqual(CONFIG_PADRAO.padrao)
+    expect(limitesPara(combustivel, config).valores).toEqual(CONFIG_PADRAO.padrao)
   })
 
   test('o produto sobrepõe a categoria, que sobrepõe o padrão (o mais específico vence)', () => {
@@ -35,17 +35,17 @@ describe('Configuração em três níveis', () => {
       porCategoria: { Fertilizantes: { excesso: { coberturaMinimaDias: 240 }, janelaConsumoDias: 90 } },
       porProduto: { 'map (FOSFATO monoamonico)': { excesso: { coberturaMinimaDias: 365 } } },
     })
-    const limites = resolverLimites(fertilizante, config)
+    const limites = limitesPara(fertilizante, config).valores
     expect(limites.excesso.coberturaMinimaDias).toBe(365) // produto
     expect(limites.janelaConsumoDias).toBe(90) // categoria
     expect(limites.vencimento).toEqual(CONFIG_PADRAO.padrao.vencimento) // padrão
-    expect(resolverLimites(outroFertilizante, config).excesso.coberturaMinimaDias).toBe(240)
+    expect(limitesPara(outroFertilizante, config).valores.excesso.coberturaMinimaDias).toBe(240)
   })
 
   test('resolver não altera a configuração', () => {
     const config = comAjustes({ porCategoria: { Fertilizantes: { excesso: { coberturaMinimaDias: 240 } } }, porProduto: {} })
     const copia = structuredClone(config)
-    resolverLimites(fertilizante, config)
+    limitesPara(fertilizante, config).valores
     expect(config).toEqual(copia)
   })
 })
@@ -80,5 +80,61 @@ describe('O motor usa o nível mais específico', () => {
     expect(alertasCom(CONFIG_PADRAO)).toContain('Calcário dolomítico | item_parado')
     const config = comAjustes({ porCategoria: { Corretivos: { itemParado: { diasSemSaida: 365 } } }, porProduto: {} })
     expect(alertasCom(config)).not.toContain('Calcário dolomítico | item_parado')
+  })
+})
+
+describe('Origem do limite (R4)', () => {
+  const config = comAjustes({
+    porCategoria: { Fertilizantes: { excesso: { coberturaMinimaDias: 365 } } },
+    porProduto: { 'Ureia': { excesso: { coberturaMinimaDias: 200 } } },
+  })
+
+  test('produto sem configuração própria usa a categoria', () => {
+    const l = limitesPara(fertilizante, config)
+    expect(l.valores.excesso.coberturaMinimaDias).toBe(365)
+    expect(l.origem['excesso.coberturaMinimaDias']).toBe('categoria Fertilizantes')
+    expect(l.origem['rupturaPrevista.coberturaMaximaDias']).toBe('padrão geral')
+  })
+
+  test('produto com configuração própria sobrescreve a categoria', () => {
+    const l = limitesPara(outroFertilizante, config)
+    expect(l.valores.excesso.coberturaMinimaDias).toBe(200)
+    expect(l.origem['excesso.coberturaMinimaDias']).toBe('produto Ureia')
+  })
+
+  test('categoria sem configuração usa o padrão geral', () => {
+    const l = limitesPara(combustivel, config)
+    expect(l.valores).toEqual(CONFIG_PADRAO.padrao)
+    expect(new Set(Object.values(l.origem))).toEqual(new Set(['padrão geral']))
+  })
+
+  test('o alerta diz, na evidência e na regra, de qual nível veio o limite', () => {
+    const base = carregarBaseSimulada()
+    const nomeDe = new Map(base.produtosNovos.map((p) => [p.id, p.nome_canonico]))
+    const comCategoria = comAjustes({
+      porCategoria: { 'Combustíveis e lubrificantes': { excesso: { coberturaMinimaDias: 200 } } },
+      porProduto: { 'Herbicida glifosato 480': { rupturaPrevista: { coberturaMaximaDias: 25 } } },
+    })
+    const r = analisar(base.movimentacoes, base.produtosNovos, HOJE_SIMULADO, { config: comCategoria })
+    const de = (produto: string, tipo: string) => r.alertas.find((a) => nomeDe.get(a.produtoId) === produto && a.tipo === tipo)!
+
+    const excesso = de('Óleo hidráulico', 'excesso')
+    expect(excesso.evidencia.origemLimite).toBe('limite da categoria Combustíveis e lubrificantes')
+    expect(excesso.regra).toMatch(/mais de 200 dias.*\(limite da categoria Combustíveis e lubrificantes\)\.$/)
+
+    const ruptura = de('Herbicida glifosato 480', 'ruptura_prevista')
+    expect(ruptura.evidencia.origemLimite).toBe('limites do padrão geral e do produto Herbicida glifosato 480')
+
+    const critico = de('Cloreto de potássio (KCl)', 'estoque_critico')
+    expect(critico.evidencia.origemLimite).toBe('limite do padrão geral')
+    expect(critico.regra).toContain('(limite do padrão geral)')
+  })
+
+  test('todo alerta da base informa a origem do limite', () => {
+    const base = carregarBaseSimulada()
+    for (const a of analisar(base.movimentacoes, base.produtosNovos, HOJE_SIMULADO).alertas) {
+      expect(a.evidencia.origemLimite, a.tipo).toEqual(expect.stringMatching(/^(limites? d|critério global)/))
+      expect(a.regra, a.tipo).toMatch(/\((limites? d.*|critério global)\)\.$/)
+    }
   })
 })

@@ -1,4 +1,5 @@
-import type { ConfigAnalise } from '../config.ts'
+import { descreverOrigem } from '../config.ts'
+import type { CampoLimite, LimitesGlobais } from '../config.ts'
 import type { AnaliseProduto } from '../consumo.ts'
 import { arred } from '../formatacao.ts'
 import type { AlertaSemMensagem } from '../mensagens.ts'
@@ -7,8 +8,8 @@ import { obterUnidade } from '../unidades.ts'
 export interface ContextoDeteccao {
   analises: readonly AnaliseProduto[]
   hojeDia: number
-  /** Limites por produto ficam em `AnaliseProduto.limites`; aqui só os globais são usados. */
-  config: ConfigAnalise
+  /** Limites que não variam por produto. Os demais vêm resolvidos em `AnaliseProduto.limites`. */
+  globais: LimitesGlobais
 }
 
 export type Detector = (ctx: ContextoDeteccao) => AlertaSemMensagem[]
@@ -33,4 +34,13 @@ export function evidenciaConsumo(a: AnaliseProduto): Record<string, number | nul
 /** Multiplica por preço, mantendo `null` quando não há preço (R2). */
 export function valor(quantidade: number, preco: number | null): number | null {
   return preco === null ? null : arred(quantidade * preco)
+}
+
+/**
+ * De qual nível vieram os limites usados (padrão geral, categoria ou produto): vai para a
+ * evidência e para o fim da regra, como parte da justificativa (R4).
+ */
+export function limiteUsado(a: AnaliseProduto, ...campos: CampoLimite[]): { origemLimite: string; regra: (texto: string) => string } {
+  const origemLimite = descreverOrigem(campos.map((c) => a.origemLimites[c]))
+  return { origemLimite, regra: (texto) => `${texto.replace(/\.$/, '')} (${origemLimite}).` }
 }

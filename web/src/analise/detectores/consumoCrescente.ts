@@ -1,7 +1,7 @@
 import { diaDe } from '../datas.ts'
 import { arred } from '../formatacao.ts'
 import type { Detector } from './comum.ts'
-import { evidenciaBase, valor } from './comum.ts'
+import { evidenciaBase, limiteUsado, valor } from './comum.ts'
 
 /** Consumo dos últimos N dias > fator × os N dias anteriores. */
 export const detectarConsumoCrescente: Detector = ({ analises, hojeDia }) =>
@@ -16,6 +16,7 @@ export const detectarConsumoCrescente: Detector = ({ analises, hojeDia }) =>
       else if (idade < 2 * n) anterior += s.quantidade
     }
     if (anterior <= 0 || recente <= fatorAumento * anterior) return []
+    const usado = limiteUsado(a, 'consumoCrescente.janelaDias', 'consumoCrescente.fatorAumento')
     return [
       {
         tipo: 'consumo_crescente',
@@ -27,8 +28,9 @@ export const detectarConsumoCrescente: Detector = ({ analises, hojeDia }) =>
           consumoAnterior: arred(anterior),
           razao: arred(recente / anterior, 1),
           janelaDias: n,
+          origemLimite: usado.origemLimite,
         },
-        regra: `Consumo dos últimos ${n} dias maior que ${String(fatorAumento).replace('.', ',')} vezes o dos ${n} dias anteriores.`,
+        regra: usado.regra(`Consumo dos últimos ${n} dias maior que ${String(fatorAumento).replace('.', ',')} vezes o dos ${n} dias anteriores.`),
         confianca: a.confianca,
         recomendacao: 'Confirmar se o aumento é esperado (época de plantio, nova área) e revisar a previsão de compra.',
         valorEnvolvido: valor(recente - anterior, a.precoMedio),

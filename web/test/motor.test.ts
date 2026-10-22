@@ -1,7 +1,7 @@
 // Testes unitários dos módulos do motor e dos limites de cada detector (casos sintéticos).
 import { describe, expect, test } from 'vitest'
 import { analisar } from '../src/analise/analisar.ts'
-import { CONFIG_PADRAO } from '../src/analise/config.ts'
+import { limitesPara } from '../src/analise/config.ts'
 import { analisarProduto } from '../src/analise/consumo.ts'
 import { diaDe } from '../src/analise/datas.ts'
 import { importarCsv, lerCsv } from '../src/analise/importacao.ts'
@@ -54,7 +54,7 @@ describe('Saldo por lote e consumo', () => {
       mov({ produto_id: 'def', tipo: 'entrada', quantidade: 10, unidade_id: 'L', data: '2026-02-01', lote: 'A', validade: '2027-01-01' }),
       mov({ produto_id: 'def', tipo: 'saida', quantidade: 12, unidade_id: 'L', data: '2026-03-01' }),
     ]
-    const lotes = analisarProduto(p, movs, HOJE_DIA, CONFIG_PADRAO.padrao).lotes
+    const lotes = analisarProduto(p, movs, HOJE_DIA, limitesPara(p)).lotes
     expect(lotes.find((l) => l.lote === 'A')).toMatchObject({ saldo: 0, zeradoEm: '2026-03-01' })
     expect(lotes.find((l) => l.lote === 'B')!.saldo).toBe(8)
   })
@@ -64,7 +64,7 @@ describe('Saldo por lote e consumo', () => {
       mov({ produto_id: 'def', tipo: 'entrada', quantidade: 10, unidade_id: 'L', data: '2026-10-01' }),
       mov({ produto_id: 'def', tipo: 'ajuste', quantidade: -3, unidade_id: 'L', data: '2026-10-10' }),
     ]
-    const a = analisarProduto(p, movs, HOJE_DIA, CONFIG_PADRAO.padrao)
+    const a = analisarProduto(p, movs, HOJE_DIA, limitesPara(p))
     expect(a.saldo).toBe(7)
     expect(a.consumoDiario).toBe(0)
     expect(a.totalSaidas).toBe(0)
@@ -73,9 +73,9 @@ describe('Saldo por lote e consumo', () => {
   test('consumo médio usa a janela de 60 dias, ou o histórico se for mais curto', () => {
     const k = produto({ id: 'k' })
     const longo = [mov({ produto_id: 'k', tipo: 'entrada', quantidade: 9000, data: '2026-01-01' }), ...retiradasPeriodicas('k', '2026-10-19', 30, 5, 10)]
-    expect(analisarProduto(k, longo, HOJE_DIA, CONFIG_PADRAO.padrao).consumoDiario).toBeCloseTo(120 / 60)
+    expect(analisarProduto(k, longo, HOJE_DIA, limitesPara(k)).consumoDiario).toBeCloseTo(120 / 60)
     const curto = [mov({ produto_id: 'k', tipo: 'entrada', quantidade: 100, data: '2026-10-10' }), mov({ produto_id: 'k', tipo: 'saida', quantidade: 20, data: '2026-10-15' })]
-    expect(analisarProduto(k, curto, HOJE_DIA, CONFIG_PADRAO.padrao)).toMatchObject({ diasJanela: 10, consumoDiario: 2 })
+    expect(analisarProduto(k, curto, HOJE_DIA, limitesPara(k))).toMatchObject({ diasJanela: 10, consumoDiario: 2 })
   })
 })
 

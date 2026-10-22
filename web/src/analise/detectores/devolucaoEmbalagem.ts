@@ -1,12 +1,13 @@
 import { SEM_LOTE } from '../consumo.ts'
 import { diaDe, isoDeDia } from '../datas.ts'
 import type { Detector } from './comum.ts'
-import { evidenciaBase } from './comum.ts'
+import { evidenciaBase, limiteUsado } from './comum.ts'
 
 /** Extra (Victor): lote de defensivo zerado → devolver as embalagens vazias dentro do prazo. */
-export const detectarDevolucaoEmbalagem: Detector = ({ analises, hojeDia, config }) =>
+export const detectarDevolucaoEmbalagem: Detector = ({ analises, hojeDia, globais }) =>
   analises.flatMap((a) => {
-    if (!config.globais.categoriasDevolucaoEmbalagem.includes(a.produto.categoria)) return []
+    if (!globais.categoriasDevolucaoEmbalagem.includes(a.produto.categoria)) return []
+    const usado = limiteUsado(a, 'devolucaoEmbalagem.prazoDias')
     const { prazoDias } = a.limites.devolucaoEmbalagem
     return a.lotes
       .filter((l) => l.zeradoEm !== null && l.primeiraEntrada !== null)
@@ -23,8 +24,9 @@ export const detectarDevolucaoEmbalagem: Detector = ({ analises, hojeDia, config
           prazoDevolucao: isoDeDia(diaDe(l.primeiraEntrada!) + prazoDias),
           diasAtePrazo: diaDe(l.primeiraEntrada!) + prazoDias - hojeDia,
           saldoLote: 0,
+          origemLimite: usado.origemLimite,
         },
-        regra: `Lote de defensivo esgotado; a embalagem vazia deve ser devolvida em até ${prazoDias} dias da compra (prazo provisório).`,
+        regra: usado.regra(`Lote de defensivo esgotado; a embalagem vazia deve ser devolvida em até ${prazoDias} dias da compra (prazo provisório).`),
         confianca: 'alta' as const,
         recomendacao: 'Fazer a tríplice lavagem e devolver as embalagens no posto de recebimento indicado na nota fiscal, se ainda não devolveu.',
         valorEnvolvido: null,

@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, test } from 'vitest'
 import { analisar, ordenarAlertas } from '../src/analise/analisar.ts'
-import { CONFIG_PADRAO } from '../src/analise/config.ts'
+import { CONFIG_PADRAO, limitesPara } from '../src/analise/config.ts'
 import { analisarProduto, calcularConfianca } from '../src/analise/consumo.ts'
 import { diaDe } from '../src/analise/datas.ts'
 import { fmtReais } from '../src/analise/formatacao.ts'
@@ -65,7 +65,7 @@ describe('R1 — unidades diferentes nunca são somadas sem conversão', () => {
       mov({ produto_id: 'inseticida', tipo: 'saida', quantidade: 250, unidade_id: 'mL', data: '2026-09-10' }),
       mov({ produto_id: 'inseticida', tipo: 'saida', quantidade: 0.5, unidade_id: 'L', data: '2026-09-20' }),
     ]
-    expect(analisarProduto(p, movs, diaDe('2026-10-20'), CONFIG_PADRAO.padrao).saldo).toBeCloseTo(1.25)
+    expect(analisarProduto(p, movs, diaDe('2026-10-20'), limitesPara(p)).saldo).toBeCloseTo(1.25)
   })
 
   test('R1: movimentação em dimensão diferente da do produto interrompe a análise', () => {

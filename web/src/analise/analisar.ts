@@ -1,6 +1,6 @@
 // Função principal do motor. Pura e determinística: recebe `hoje`, não lê o relógio,
 // não persiste nada. Chamar de novo com novas movimentações recalcula tudo (R6).
-import { CONFIG_PADRAO, resolverLimites } from './config.ts'
+import { CONFIG_PADRAO, limitesPara } from './config.ts'
 import type { ConfigAnalise } from './config.ts'
 import { analisarProduto } from './consumo.ts'
 import type { AnaliseProduto } from './consumo.ts'
@@ -58,8 +58,9 @@ export function analisar(
     lista.push(m)
   }
 
-  const analises = produtos.map((p) => analisarProduto(p, porProduto.get(p.id)!, hojeDia, resolverLimites(p, config)))
-  const ctx = { analises, hojeDia, config }
+  const analises = produtos.map((p) => analisarProduto(p, porProduto.get(p.id)!, hojeDia, limitesPara(p, config)))
+  // Os detectores não leem a configuração: recebem os limites já resolvidos por produto e os globais.
+  const ctx = { analises, hojeDia, globais: config.globais }
   const alertas = DETECTORES.flatMap((detectar) => detectar(ctx)).map(comMensagem)
 
   let origens: Origem[] = []

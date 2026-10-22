@@ -3,7 +3,7 @@ import { diaDe } from '../datas.ts'
 import { arred } from '../formatacao.ts'
 import type { AlertaSemMensagem } from '../mensagens.ts'
 import type { Detector } from './comum.ts'
-import { evidenciaBase, valor } from './comum.ts'
+import { evidenciaBase, limiteUsado, valor } from './comum.ts'
 
 /**
  * Por lote: quantidade do lote > consumo projetado até a validade.
@@ -19,11 +19,12 @@ export const detectarVencimento: Detector = ({ analises, hojeDia }) =>
     for (const l of lotes) {
       const dias = diaDe(l.validade!) - hojeDia
       const projetado = Math.max(0, a.consumoDiario * Math.max(dias, 0) - consumidoAntes)
-      const usado = Math.min(projetado, l.saldo)
-      consumidoAntes += usado
-      const emRisco = dias < 0 ? l.saldo : l.saldo - usado
+      const usadoAteValidade = Math.min(projetado, l.saldo)
+      consumidoAntes += usadoAteValidade
+      const emRisco = dias < 0 ? l.saldo : l.saldo - usadoAteValidade
       if (dias > horizonteDias || emRisco <= 1e-9) continue
       const vencido = dias < 0
+      const usado = limiteUsado(a, 'vencimento.horizonteDias', 'vencimento.diasParaCritico')
       alertas.push({
         tipo: 'vencimento',
         nivel: vencido || dias <= diasParaCritico ? 'critico' : 'atencao',
@@ -37,10 +38,13 @@ export const detectarVencimento: Detector = ({ analises, hojeDia }) =>
           consumoProjetadoAteValidade: vencido ? 0 : arred(projetado),
           quantidadeEmRisco: arred(emRisco),
           consumoMedioDiario: arred(a.consumoDiario, 3),
+          origemLimite: usado.origemLimite,
         },
-        regra: vencido
-          ? 'Lote com validade vencida e ainda com saldo.'
-          : 'Quantidade do lote maior que o consumo previsto até a validade, pelo consumo médio recente.',
+        regra: usado.regra(
+          vencido
+            ? 'Lote com validade vencida e ainda com saldo.'
+            : 'Quantidade do lote maior que o consumo previsto até a validade, pelo consumo médio recente.',
+        ),
         confianca: vencido ? 'alta' : a.confianca,
         recomendacao: vencido
           ? 'Separar o lote vencido, não aplicar e verificar a destinação correta com o fornecedor.'

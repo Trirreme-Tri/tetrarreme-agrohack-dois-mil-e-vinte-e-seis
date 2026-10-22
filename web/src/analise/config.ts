@@ -4,7 +4,7 @@
 // Três níveis, do mais geral ao mais específico:
 //   padrao  →  porCategoria  →  porProduto
 // Para cada produto, o motor usa o valor do nível mais específico que o define
-// (ver `resolverLimites`). Um ajuste só precisa trazer o que muda; o resto vem do nível acima.
+// (ver `limitesPara`). Um ajuste só precisa trazer o que muda; o resto vem do nível acima.
 //
 // `globais` reúne o que compara produtos entre si (ou vale para a análise toda) e,
 // por isso, não pode variar por produto.
@@ -134,6 +134,28 @@ export const CONFIG_PADRAO: ConfigAnalise = {
   },
 }
 
+/** Caminho de um limite ajustável ("excesso.coberturaMinimaDias", "janelaConsumoDias"...). */
+export type CampoLimite = {
+  [K in keyof Limites]: Limites[K] extends object ? `${K}.${keyof Limites[K] & string}` : K
+}[keyof Limites]
+
+/** De onde veio um limite: "padrão geral", "categoria Fertilizantes" ou "produto Óleo diesel S10". */
+export type OrigemLimite = string
+
+/** Limites efetivos de um produto e o nível de onde veio cada um. */
+export interface LimitesDoProduto {
+  valores: Limites
+  origem: Record<CampoLimite, OrigemLimite>
+}
+
+function campos(limites: Limites | AjusteLimites): CampoLimite[] {
+  return Object.entries(limites).flatMap(([chave, valor]) =>
+    valor !== null && typeof valor === 'object'
+      ? Object.keys(valor).filter((k) => (valor as Record<string, unknown>)[k] !== undefined).map((k) => `${chave}.${k}`)
+      : valor === undefined ? [] : [chave],
+  ) as CampoLimite[]
+}
+
 function aplicar(base: Limites, ajuste: AjusteLimites | undefined): Limites {
   if (!ajuste) return base
   const resultado: Record<string, unknown> = { ...base }
@@ -145,18 +167,31 @@ function aplicar(base: Limites, ajuste: AjusteLimites | undefined): Limites {
   return resultado as unknown as Limites
 }
 
-/** Ajuste do produto em `porProduto`, achado pelo nome canônico normalizado. */
-function ajusteDoProduto(nome: string, porProduto: ConfigAnalise['porProduto']): AjusteLimites | undefined {
+/** Chave de `porProduto` que corresponde ao produto (nome canônico normalizado). */
+export function chaveDoProduto(nome: string, porProduto: ConfigAnalise['porProduto']): string | undefined {
   const alvo = normalizarNome(nome)
-  const chave = Object.keys(porProduto).find((k) => normalizarNome(k) === alvo)
-  return chave === undefined ? undefined : porProduto[chave]
+  return Object.keys(porProduto).find((k) => normalizarNome(k) === alvo)
 }
 
-/** Limites efetivos de um produto: padrão geral ← categoria ← produto (o mais específico vence). */
-export function resolverLimites(
+/**
+ * Única função que resolve limites: padrão geral ← categoria ← produto (o mais específico vence,
+ * campo a campo). Devolve também a origem de cada limite, para a justificativa do alerta (R4).
+ */
+export function limitesPara(
   produto: Pick<Produto, 'nome_canonico' | 'categoria'>,
   config: ConfigAnalise = CONFIG_PADRAO,
-): Limites {
-  const daCategoria = aplicar(config.padrao, config.porCategoria[produto.categoria])
-  return aplicar(daCategoria, ajusteDoProduto(produto.nome_canonico, config.porProduto))
+): LimitesDoProduto {
+  const origem = Object.fromEntries(campos(config.padrao).map((c) => [c, 'padrão geral'])) as Record<CampoLimite, OrigemLimite>
+  const daCategoria = config.porCategoria[produto.categoria]
+  const chave = chaveDoProduto(produto.nome_canonico, config.porProduto)
+  const doProduto = chave === undefined ? undefined : config.porProduto[chave]
+  for (const c of daCategoria ? campos(daCategoria) : []) origem[c] = `categoria ${produto.categoria}`
+  for (const c of doProduto ? campos(doProduto) : []) origem[c] = `produto ${produto.nome_canonico}`
+  return { valores: aplicar(aplicar(config.padrao, daCategoria), doProduto), origem }
+}
+
+/** "limite da categoria Fertilizantes"; com origens diferentes: "limites do padrão geral e do produto X". */
+export function descreverOrigem(origens: readonly OrigemLimite[]): string {
+  const distintas = [...new Set(origens)].map((o) => (o.startsWith('categoria ') ? `da ${o}` : `do ${o}`))
+  return `${distintas.length > 1 ? 'limites' : 'limite'} ${distintas.join(' e ')}`
 }

@@ -2,7 +2,7 @@ import { diaDe } from '../datas.ts'
 import { arred } from '../formatacao.ts'
 import type { Confianca } from '@tetrarreme/contrato'
 import type { Detector } from './comum.ts'
-import { evidenciaBase } from './comum.ts'
+import { evidenciaBase, limiteUsado } from './comum.ts'
 
 /** Última compra com preço difere mais que o limite da média das compras anteriores. */
 export const detectarVariacaoPreco: Detector = ({ analises, hojeDia }) =>
@@ -15,6 +15,7 @@ export const detectarVariacaoPreco: Detector = ({ analises, hojeDia }) =>
     const media = anteriores.reduce((t, x) => t + x.precoUnitBase, 0) / anteriores.length
     const variacao = (ultima.precoUnitBase - media) / media
     if (Math.abs(variacao) <= c.variacaoMinima) return []
+    const usado = limiteUsado(a, 'variacaoPreco.variacaoMinima')
     const confianca: Confianca = anteriores.length >= 5 ? 'alta' : anteriores.length >= 3 ? 'media' : 'baixa'
     return [
       {
@@ -29,8 +30,9 @@ export const detectarVariacaoPreco: Detector = ({ analises, hojeDia }) =>
           variacaoPercentual: arred(variacao * 100, 1),
           comprasAnteriores: anteriores.length,
           quantidadeComprada: arred(ultima.quantidade),
+          origemLimite: usado.origemLimite,
         },
-        regra: `Preço da última compra difere mais de ${Math.round(c.variacaoMinima * 100)}% da média das compras anteriores.`,
+        regra: usado.regra(`Preço da última compra difere mais de ${Math.round(c.variacaoMinima * 100)}% da média das compras anteriores.`),
         confianca,
         recomendacao: 'Conferir a nota fiscal e cotar com outros fornecedores antes da próxima compra.',
         valorEnvolvido: arred(Math.abs(ultima.precoUnitBase - media) * ultima.quantidade),

@@ -1,5 +1,5 @@
 // Saldo por lote, consumo médio, cobertura e confiança (R3: calculada aqui, nunca armazenada).
-import type { Limites } from './config.ts'
+import type { CampoLimite, Limites, LimitesDoProduto, OrigemLimite } from './config.ts'
 import { diaDe } from './datas.ts'
 import type { Confianca, Movimentacao, Produto } from '@tetrarreme/contrato'
 import { converter } from './unidades.ts'
@@ -36,6 +36,8 @@ export interface AnaliseProduto {
   produto: Produto
   /** Limites efetivos deste produto (padrão geral ← categoria ← produto). */
   limites: Limites
+  /** Nível de onde veio cada limite (justificativa dos alertas, R4). */
+  origemLimites: Record<CampoLimite, OrigemLimite>
   /** Saldo total na unidade base. */
   saldo: number
   lotes: SaldoLote[]
@@ -151,7 +153,7 @@ export function analisarProduto(
   produto: Produto,
   movsDoProduto: readonly Movimentacao[],
   hojeDia: number,
-  limites: Limites,
+  { valores: limites, origem: origemLimites }: LimitesDoProduto,
 ): AnaliseProduto {
   const movs = ordenarMovimentacoes(movsDoProduto, hojeDia)
   const lotes = calcularLotes(produto, movs)
@@ -185,6 +187,7 @@ export function analisarProduto(
   return {
     produto,
     limites,
+    origemLimites,
     saldo,
     lotes,
     consumoDiario,
