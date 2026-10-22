@@ -138,3 +138,29 @@ describe('Origem do limite (R4)', () => {
     }
   })
 })
+
+describe('Chaves órfãs em porProduto', () => {
+  const base = carregarBaseSimulada()
+
+  test('sem ajustes por produto, não há aviso', () => {
+    expect(analisar(base.movimentacoes, base.produtosNovos, HOJE_SIMULADO).avisosConfiguracao).toEqual([])
+  })
+
+  test('chave que não corresponde a nenhum produto gera aviso de configuração, não alerta de estoque', () => {
+    const config = comAjustes({
+      porCategoria: {},
+      porProduto: {
+        'herbicida GLIFOSATO 480': { rupturaPrevista: { coberturaMaximaDias: 15 } }, // corresponde (normalizado)
+        'Glifosato 480 Atar': { excesso: { coberturaMinimaDias: 90 } }, // não existe
+      },
+    })
+    const padrao = analisar(base.movimentacoes, base.produtosNovos, HOJE_SIMULADO)
+    const r = analisar(base.movimentacoes, base.produtosNovos, HOJE_SIMULADO, { config })
+    expect(r.avisosConfiguracao).toEqual([
+      { tipo: 'produto_nao_encontrado', chave: 'Glifosato 480 Atar', mensagem: expect.stringContaining('"Glifosato 480 Atar" não corresponde a nenhum produto') },
+    ])
+    // O aviso não entra na lista de alertas de estoque.
+    expect(r.alertas.length).toBe(padrao.alertas.length - 1) // só some a ruptura do glifosato (ajuste válido)
+    expect(r.alertas.some((a) => a.mensagem.includes('Atar'))).toBe(false)
+  })
+})

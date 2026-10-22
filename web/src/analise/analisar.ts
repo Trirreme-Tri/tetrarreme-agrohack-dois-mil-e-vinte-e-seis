@@ -1,6 +1,6 @@
 // Função principal do motor. Pura e determinística: recebe `hoje`, não lê o relógio,
 // não persiste nada. Chamar de novo com novas movimentações recalcula tudo (R6).
-import { CONFIG_PADRAO, limitesPara } from './config.ts'
+import { CONFIG_PADRAO, chaveDoProduto, limitesPara } from './config.ts'
 import type { ConfigAnalise } from './config.ts'
 import { analisarProduto } from './consumo.ts'
 import type { AnaliseProduto } from './consumo.ts'
@@ -17,6 +17,14 @@ export interface OpcoesAnalise {
   importacoes?: readonly Importacao[]
 }
 
+/** Problema na configuração de limites. Não é alerta de estoque: é para quem mantém a config. */
+export interface AvisoConfiguracao {
+  tipo: 'produto_nao_encontrado'
+  /** Chave de `porProduto` sem produto correspondente. */
+  chave: string
+  mensagem: string
+}
+
 export interface ResultadoAnalise {
   /** Data de referência da análise, `AAAA-MM-DD`. */
   data: string
@@ -26,6 +34,20 @@ export interface ResultadoAnalise {
   produtos: AnaliseProduto[]
   /** Origens das importações usadas; vazio se `importacoes` não foi informado. */
   origens: Origem[]
+  /** Ajustes da configuração que não estão sendo aplicados (ex.: nome de produto digitado errado). */
+  avisosConfiguracao: AvisoConfiguracao[]
+}
+
+/** Chaves de `porProduto` que não correspondem a nenhum produto: o ajuste seria ignorado em silêncio. */
+export function verificarConfiguracao(produtos: readonly Produto[], config: ConfigAnalise): AvisoConfiguracao[] {
+  const usadas = new Set(produtos.map((p) => chaveDoProduto(p.nome_canonico, config.porProduto)))
+  return Object.keys(config.porProduto)
+    .filter((chave) => !usadas.has(chave))
+    .map((chave) => ({
+      tipo: 'produto_nao_encontrado' as const,
+      chave,
+      mensagem: `O ajuste de limites para "${chave}" não corresponde a nenhum produto cadastrado e não está sendo aplicado. Confira o nome.`,
+    }))
 }
 
 const ORDEM_NIVEL: Record<NivelAlerta, number> = { critico: 0, atencao: 1, informativo: 2 }
@@ -75,5 +97,6 @@ export function analisar(
     resumoFinanceiro: resumirFinanceiro(analises),
     produtos: analises,
     origens,
+    avisosConfiguracao: verificarConfiguracao(produtos, config),
   }
 }
