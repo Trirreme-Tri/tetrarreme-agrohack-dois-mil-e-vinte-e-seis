@@ -1,6 +1,7 @@
 {
   "name": "tetrarreme-agrohack",
   "private": true,
+  "type": "module",
   "workspaces": [
     "contrato",
     "web"
