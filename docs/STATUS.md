@@ -3,7 +3,7 @@
 > Atualizado pelo Claude Code ao fim de cada sessão. Enviado ao Projeto do claude.ai para revisão.
 
 ## Última atualização
-21/10/2026 — Sessão 2 (status, decisão de infraestrutura e motor de análise)
+22/10/2026 — Sessão 2 + adendo (contrato de dados compartilhado)
 
 ## Feito nesta sessão
 - Pendências registradas neste arquivo.
@@ -22,13 +22,21 @@
 - Testes em `web/test/`: conformidade (R1–R8), detecção guiada por `SITUACOES.md`, falsos positivos,
   reanálise e testes unitários dos limites de cada detector.
 - README: tabela de tecnologias/licenças e linha de uso do Claude Code.
+- **Adendo:** monorepo com npm workspaces (`contrato/`, `web/`). Pacote `@tetrarreme/contrato`
+  (`contrato/src/index.ts`) com schemas Zod e tipos inferidos de Unidade, Produto, ProdutoAlias,
+  Importacao, Movimentacao e Alerta. O motor importa os tipos de lá (`web/src/analise/tipos.ts` removido).
+  O importador valida cada linha com `MovimentacaoSchema`; linha inválida vira erro com linha e motivo.
 
 ## Testes
-`npm test` em `web/`: **72 testes, 72 passaram** (3 arquivos: `conformidade.test.ts`, `deteccao.test.ts`, `motor.test.ts`).
-Também passam `tsc -b`, `oxlint` e `vite build`.
+`npm test` na raiz (todos os workspaces): **103 testes, 103 passaram**.
+- `contrato/`: 27 testes (`contrato.test.ts`: válidos e inválidos de cada schema).
+- `web/`: 76 testes (`conformidade.test.ts`, `deteccao.test.ts`, `motor.test.ts`).
+
+Também passam `npm run typecheck` (os dois workspaces), `oxlint` e `vite build`.
 
 ## Decisões tomadas
 - Banco Neon; backend Cloudflare Workers com Hono.
+- Contrato de dados único em `contrato/` (Zod), compartilhado por interface, motor e API; monorepo com npm workspaces.
 - Interpretações da especificação no motor, todas registradas em `docs/DECISOES.md` (21/10/2026). Principais:
   níveis de cada tipo de alerta; limites adicionais provisórios em `config.ts` (horizonte de vencimento,
   janela da retirada atípica, piso do MAD, regras da variação de preço); definição do `valorEnvolvido` de
@@ -38,7 +46,7 @@ Também passam `tsc -b`, `oxlint` e `vite build`.
 | Regra | Implementada | Testada |
 |---|---|---|
 | R1 | Sim — `unidades.ts`, conversão em saldo, consumo, preço e importação | Sim |
-| R2 | Sim — `importacao.ts` (ausentes → `null`), `financeiro.ts` (itens sem preço), `fmtReais` ("sem preço") | Sim |
+| R2 | Sim — `importacao.ts` (ausentes → `null`; cada linha validada pelo contrato, inválida reportada com motivo), `financeiro.ts` (itens sem preço), `fmtReais` ("sem preço") | Sim |
 | R3 | Sim — `calcularConfianca` na análise; mensagens sem dias com confiança insuficiente | Sim |
 | R4 | Sim — alerta estruturado; `gerarMensagem` monta a mensagem a partir dos campos | Sim |
 | R5 | Sim — `ordenarAlertas` (nível, depois maior valor envolvido) | Sim |
@@ -50,6 +58,7 @@ Também passam `tsc -b`, `oxlint` e `vite build`.
 - Claude Code escreveu todo o código do motor de análise, a base simulada, o gerador e os testes,
   a partir do `CLAUDE.md` e das instruções da sessão 2 preparadas no Projeto do claude.ai.
 - Claude Code registrou as decisões de interpretação em `docs/DECISOES.md` e atualizou o README.
+- Claude Code criou o pacote `contrato/` (schemas Zod e testes) e migrou o motor e o importador para ele (adendo).
 - Pendente: revisão humana do código e dos limites (coluna "Revisão pela equipe" do README).
 
 ## Pendências e bloqueios

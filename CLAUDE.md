@@ -135,7 +135,14 @@ Com confiança `insuficiente`, não exibir número de dias: dizer que não há h
   serverless do Neon (`@neondatabase/serverless`), compatível com Workers.
 - **Hospedagem:** Frontend no Cloudflare Pages; backend no Cloudflare Workers.
 - **Testes:** Vitest em todo o projeto (motor de análise obrigatório).
-- **Estrutura:** monorepo com `web/` (PWA + motor de análise) e `api/` (sincronização).
+- **Estrutura:** monorepo com npm workspaces (`package.json` na raiz):
+  - `contrato/` (`@tetrarreme/contrato`): contrato de dados único — schemas Zod e tipos inferidos
+    (`z.infer`) de Unidade, Produto, ProdutoAlias, Importacao, Movimentacao e Alerta (seções 5 e 6).
+    Interface, motor e API importam os tipos daqui; nenhum outro pacote os redeclara.
+  - `web/`: PWA + motor de análise (`web/src/analise/`).
+  - `api/`: sincronização (ainda não criado).
+- **Validação:** todo dado que entra (importação de CSV e, futuramente, registro na interface e `POST /sync`)
+  é validado pelos schemas do contrato. Registro inválido é reportado com o motivo, nunca corrigido em silêncio (R2).
 
 ## 8. Interface
 
