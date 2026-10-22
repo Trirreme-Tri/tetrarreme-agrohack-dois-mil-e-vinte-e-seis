@@ -2,14 +2,15 @@
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { DATA_REFERENCIA } from '../../data/simulados/gerar.ts'
 import { importarCsv } from '../src/analise/importacao.ts'
 import type { MapeamentoColunas, ResultadoImportacao } from '../src/analise/importacao.ts'
 import type { Movimentacao, Produto } from '@tetrarreme/contrato'
 
 export const PASTA_SIMULADOS = join(dirname(fileURLToPath(import.meta.url)), '../../data/simulados')
 
-/** Data de referência da base simulada. */
-export const HOJE_SIMULADO = new Date('2026-10-20T12:00:00Z')
+/** Data de referência da base simulada: a mesma do gerador. */
+export const HOJE_SIMULADO = new Date(`${DATA_REFERENCIA}T12:00:00Z`)
 
 export const MAPEAMENTO_SIMULADO: MapeamentoColunas = {
   produto: 'produto',

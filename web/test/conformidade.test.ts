@@ -328,8 +328,9 @@ describe('R8 — produtos com nomes diferentes', () => {
     expect(numerosCompativeis('NPK 04-14-08', 'NPK 04-30-16')).toBe(false)
     const npk1 = produto({ id: 'a', nome_canonico: 'NPK 04-14-08' })
     const npk2 = produto({ id: 'b', nome_canonico: 'NPK 04-30-16' })
-    expect(sugerirDuplicidades([npk1, npk2], 0)).toEqual([])
-    expect(sugerirProdutos('npk 4-30-16', [npk1], 0)).toEqual([])
+    const qualquerNome = { similaridadeMinima: 0, similaridadePalavra: 0 }
+    expect(sugerirDuplicidades([npk1, npk2], qualquerNome)).toEqual([])
+    expect(sugerirProdutos('npk 4-30-16', [npk1], qualquerNome)).toEqual([])
     expect(() => confirmarAlias('NPK 04-30-16', npk1)).toThrow(ErroUnificacao)
   })
 
@@ -337,8 +338,12 @@ describe('R8 — produtos com nomes diferentes', () => {
     const ureia = base.produtosNovos.find((p) => p.nome_canonico === 'Ureia')!
     const ureia45 = base.produtosNovos.find((p) => p.nome_canonico === 'UREIA 45%')!
     expect(ureia45.id).not.toBe(ureia.id)
+    const glifosato = base.produtosNovos.find((p) => p.nome_canonico === 'Glifosato 480')!
+    const glifozato = base.produtosNovos.find((p) => p.nome_canonico === 'Glifozato 480')!
+    expect(glifozato.id).not.toBe(glifosato.id)
     expect(base.sugestoesUnificacao).toEqual([
       { nomeNovo: 'UREIA 45%', produtoNovoId: ureia45.id, candidatos: [{ produtoId: ureia.id, nome: 'Ureia' }] },
+      { nomeNovo: 'Glifozato 480', produtoNovoId: glifozato.id, candidatos: [{ produtoId: glifosato.id, nome: 'Glifosato 480' }] },
     ])
   })
 
@@ -346,7 +351,7 @@ describe('R8 — produtos com nomes diferentes', () => {
     const glifosato = produto({ id: 'gli', nome_canonico: 'Glifosato 480' })
     expect(resolverProduto('glifosato 480', [glifosato], [])).toBe(glifosato)
     expect(resolverProduto('Glifosato Atar 480', [glifosato], [])).toBeNull()
-    expect(sugerirProdutos('Glifozato 480', [glifosato], CONFIG_PADRAO.duplicidade.similaridadeMinima)).toEqual([glifosato])
+    expect(sugerirProdutos('Glifozato 480', [glifosato], CONFIG_PADRAO.duplicidade)).toEqual([glifosato])
 
     const naoConfirmado = { nome_original: 'Glifosato Atar 480', produto_id: 'gli', confirmado: false }
     expect(resolverProduto('Glifosato Atar 480', [glifosato], [naoConfirmado])).toBeNull()
@@ -355,11 +360,20 @@ describe('R8 — produtos com nomes diferentes', () => {
     expect(resolverProduto('GLIFOSATO ATAR 480', [glifosato], [confirmado])).toBe(glifosato)
   })
 
-  test('R8: possível duplicidade gera alerta, e o par NPK não gera', () => {
+  test('R8: possível duplicidade gera alerta; pares parecidos de produtos diferentes não geram', () => {
     const duplicidades = resultadoBase.alertas.filter((a) => a.tipo === 'possivel_duplicidade')
-    expect(duplicidades).toHaveLength(1)
-    expect(nomeDe(duplicidades[0].produtoId)).toBe('UREIA 45%')
-    expect(duplicidades[0].evidencia.outroProduto).toBe('Ureia')
+    const pares = duplicidades.map((a) => `${nomeDe(a.produtoId)} ~ ${a.evidencia.outroProduto}`).sort()
+    expect(pares).toEqual(['Glifozato 480 ~ Glifosato 480', 'UREIA 45% ~ Ureia'])
+  })
+
+  test('R8: palavras diferentes não viram duplicidade, mesmo com nomes parecidos', () => {
+    const criterio = CONFIG_PADRAO.duplicidade
+    const calcitico = produto({ id: 'a', nome_canonico: 'Calcário calcítico', categoria: 'Corretivos' })
+    const dolomitico = produto({ id: 'b', nome_canonico: 'Calcário dolomítico', categoria: 'Corretivos' })
+    expect(sugerirDuplicidades([calcitico, dolomitico], criterio)).toEqual([])
+    const soja = produto({ id: 'c', nome_canonico: 'Semente de soja', categoria: 'Sementes' })
+    const feijao = produto({ id: 'd', nome_canonico: 'Semente de feijão', categoria: 'Sementes' })
+    expect(sugerirDuplicidades([soja, feijao], criterio)).toEqual([])
   })
 })
 
