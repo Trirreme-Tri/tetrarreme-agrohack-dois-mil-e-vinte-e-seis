@@ -211,3 +211,30 @@ describe('Consumo zero na janela (ex.: fertilizante fora da safra)', () => {
     expect(r.alertas).toEqual([])
   })
 })
+
+describe('Devolução de embalagem: nível progressivo conforme o prazo', () => {
+  const def = produto({ id: 'd', unidade_base_id: 'L', categoria: 'Defensivos e biológicos' })
+  // Lote comprado em 01/01/2026 e esgotado em 01/02/2026: prazo (365 dias) em 01/01/2027.
+  const movs = [
+    mov({ produto_id: 'd', tipo: 'entrada', quantidade: 5, unidade_id: 'L', data: '2026-01-01', lote: 'X' }),
+    mov({ produto_id: 'd', tipo: 'saida', quantidade: 5, unidade_id: 'L', data: '2026-02-01' }),
+  ]
+  const alertaEm = (data: string) => analisar(movs, [def], new Date(`${data}T00:00:00Z`)).alertas.find((a) => a.tipo === 'devolucao_embalagem')
+
+  test.each([
+    ['2026-10-20', 'informativo', 73],
+    ['2026-11-02', 'atencao', 60],
+    ['2026-12-16', 'atencao', 16],
+    ['2026-12-17', 'critico', 15],
+    ['2027-01-01', 'critico', 0],
+  ] as const)('em %s: %s (faltam %i dias)', (data, nivel, faltam) => {
+    const a = alertaEm(data)!
+    expect(a.nivel).toBe(nivel)
+    expect(a.evidencia.diasAtePrazo).toBe(faltam)
+    expect(a.mensagem).toContain(`faltam ${faltam} dias`)
+  })
+
+  test('depois do prazo, o alerta sai da lista', () => {
+    expect(alertaEm('2027-01-02')).toBeUndefined()
+  })
+})

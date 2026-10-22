@@ -50,7 +50,14 @@ export interface Limites {
     /** Só avalia a última compra se ela tiver sido feita nestes últimos dias. */
     janelaDias: number
   }
-  devolucaoEmbalagem: { prazoDias: number }
+  devolucaoEmbalagem: {
+    /** Prazo para devolver a embalagem vazia, contado da compra do lote. */
+    prazoDias: number
+    /** Faltando até estes dias para o prazo: `atencao`. */
+    diasAtencao: number
+    /** Faltando até estes dias para o prazo: `critico`. */
+    diasCritico: number
+  }
   /** Dias de consumo usados para estimar o valor de reposição (estoque crítico e ruptura). */
   diasReposicao: number
 }
@@ -106,8 +113,9 @@ export const CONFIG_PADRAO: ConfigAnalise = {
     excesso: { coberturaMinimaDias: 180 },
     itemParado: { diasSemSaida: 60 },
     variacaoPreco: { variacaoMinima: 0.2, minimoComprasAnteriores: 2, janelaDias: 60 },
-    // Prazo legal usual: até 1 ano da compra. A confirmar com o Victor.
-    devolucaoEmbalagem: { prazoDias: 365 },
+    // PROVISÓRIO — calibrar com o Victor. Prazo usual: até 1 ano da compra.
+    // Nível: informativo; atenção a ≤ 60 dias do prazo; crítico a ≤ 15 dias.
+    devolucaoEmbalagem: { prazoDias: 365, diasAtencao: 60, diasCritico: 15 },
     diasReposicao: 30,
   },
 

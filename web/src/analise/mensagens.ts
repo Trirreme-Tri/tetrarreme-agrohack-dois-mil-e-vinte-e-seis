@@ -51,7 +51,7 @@ export function gerarMensagem(a: AlertaSemMensagem): string {
     case 'possivel_duplicidade':
       return `Possível duplicidade: "${e.produto}" e "${e.outroProduto}" parecem ser o mesmo produto. Confirme antes de unificar.`
     case 'devolucao_embalagem':
-      return `Devolução de embalagem: o lote ${e.lote} de ${p} acabou em ${data(e.zeradoEm)}. Devolva as embalagens vazias até ${data(e.prazoDevolucao)}.`
+      return `Devolução de embalagem: o lote ${e.lote} de ${p} acabou em ${data(e.zeradoEm)}. Devolva as embalagens vazias até ${data(e.prazoDevolucao)} (faltam ${fmtNum(e.diasAtePrazo)} dias).`
   }
 }
 
