@@ -50,10 +50,10 @@ describe('Configuração em três níveis', () => {
     expect(limitesPara(outroFertilizante, config).valores.excesso.coberturaMinimaDias).toBe(240)
   })
 
-  test('resolver não altera a configuração', () => {
+  test('limitesPara não altera a configuração', () => {
     const config = comAjustes({ porCategoria: { Fertilizantes: { excesso: { coberturaMinimaDias: 240 } } }, porProduto: {} })
     const copia = structuredClone(config)
-    limitesPara(fertilizante, config).valores
+    expect(limitesPara(fertilizante, config).valores.excesso.coberturaMinimaDias).toBe(240)
     expect(config).toEqual(copia)
   })
 })

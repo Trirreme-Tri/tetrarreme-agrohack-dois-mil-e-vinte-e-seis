@@ -3,87 +3,81 @@
 > Atualizado pelo Claude Code ao fim de cada sessão. Enviado ao Projeto do claude.ai para revisão.
 
 ## Última atualização
-22/10/2026 — Sessão 2 + adendos (contrato de dados; sem base oficial; limites em três níveis)
+22/10/2026 — Sessão 3 (ajustes da revisão de conformidade + adendo sobre o `config.ts`)
 
 ## Feito nesta sessão
-- Pendências registradas neste arquivo.
-- Decisão de infraestrutura: Neon + Cloudflare Workers (`docs/DECISOES.md` e `CLAUDE.md`, seção 7).
-- Projeto `web/` criado (Vite + React + TypeScript, template sem telas) com Vitest (`npm test`).
-- Motor de análise em `web/src/analise/`, TypeScript puro, sem UI, rede ou banco:
-  - `tipos.ts`, `config.ts` (todos os limites provisórios), `datas.ts`, `unidades.ts` (R1);
-  - `produtos.ts` (canônico, apelidos, sugestão de duplicidade, R8);
-  - `importacao.ts` (CSV com mapeamento de colunas configurável, ausentes → `null`, origem, pseudonimização; R2, R7);
-  - `consumo.ts` (saldo por lote, consumo médio, cobertura, confiança na análise; R3);
-  - `detectores/` (os 10 tipos da seção 6, um arquivo cada), `mensagens.ts` (R4), `financeiro.ts` (R2);
-  - `analisar.ts`: `analisar(movimentacoes, produtos, hoje, opcoes?)` pura e determinística; ordena alertas (R5); recalcula tudo a cada chamada (R6).
-- Base simulada em `data/simulados/` (ver adendo "sem base oficial" abaixo).
-- Testes em `web/test/`: conformidade (R1–R8), detecção guiada pelas situações do gerador, falsos positivos,
-  reanálise e testes unitários dos limites de cada detector.
-- README: tabela de tecnologias/licenças e linha de uso do Claude Code.
-- **Adendo:** monorepo com npm workspaces (`contrato/`, `web/`). Pacote `@tetrarreme/contrato`
-  (`contrato/src/index.ts`) com schemas Zod e tipos inferidos de Unidade, Produto, ProdutoAlias,
-  Importacao, Movimentacao e Alerta. O motor importa os tipos de lá (`web/src/analise/tipos.ts` removido).
-  O importador valida cada linha com `MovimentacaoSchema`; linha inválida vira erro com linha e motivo.
-- **Adendo — sem base oficial:** a organização não fornecerá a base; a demonstração usa a base simulada,
-  sempre identificada como SIMULADA (CLAUDE.md R7 e seção 12 atualizados). Novo gerador
-  `data/simulados/gerar.ts`: semente fixa, 44 produtos nas 8 categorias, 1.753 movimentações de
-  21/10/2025 a 20/10/2026, 13 situações plantadas (todos os 10 tipos, cada uma comentada no código),
-  31 produtos normais; gera `movimentacoes.csv` e `SITUACOES.md` (`npm run gerar:simulados`).
-  Testes de detecção usam essa base e a data de referência exportada pelo gerador.
-- Heurística de duplicidade refinada (palavra a palavra), para não confundir "Calcário calcítico" com
-  "Calcário dolomítico" e continuar pegando "Glifozato 480" × "Glifosato 480".
-- Limites em três níveis no `config.ts`: padrão geral → por categoria → por produto (`resolverLimites`).
-  Cada produto recebe seus limites efetivos na análise (`AnaliseProduto.limites`). Começa só com o padrão;
-  as 8 categorias estão prontas e vazias para o Victor preencher.
+- **Parte 1 — Anexo III:** tabela de exemplos por categoria copiada para o `CLAUDE.md` (seção 5).
+  Catálogo do `data/simulados/gerar.ts` refeito com **todos** os 52 exemplos do Anexo (genéricos
+  especificados) + 2 extras só para as situações de duplicidade ("UREIA 45%", "Herbicida glifozato 480");
+  53 produtos, 2.229 movimentações. Mapa "exemplo do Anexo → produto" exportado (`ANEXO_III`) e
+  publicado no `SITUACOES.md`. Os três "filtros" (peças, irrigação, EPI) são produtos distintos e
+  nunca sugeridos para unificação (teste). `excesso` plantado passou para o óleo hidráulico e
+  `item_parado` para a sobra de calcário da safra passada (superfosfato saiu: não está no Anexo).
+- **Parte 2 — origem do limite:** função única `limitesPara(produto, config)` resolve os limites e a
+  origem de cada um; os detectores não leem a config (recebem limites por produto e os globais).
+  Todo alerta registra na evidência (`origemLimite`) e no fim da regra de qual nível veio o limite
+  ("limite da categoria Fertilizantes", "limite do padrão geral", "limite do produto X").
+- **Adendo 1 — confiança (R3):** conta só as saídas dentro da janela do consumo médio.
+- **Adendo 2 — consumo zero:** cobertura `null` (nunca infinita), exibida como "sem consumo recente"
+  (`fmtCobertura`); sem ruptura nem excesso; estoque crítico só pelo mínimo, sem dias.
+- **Adendo 3 — chaves órfãs:** `analisar()` devolve `avisosConfiguracao` quando uma chave de
+  `porProduto` não corresponde a nenhum produto (separado dos alertas de estoque).
+- **Adendo 4 — embalagem:** nível progressivo (informativo; atenção a ≤ 60 dias do prazo; crítico a
+  ≤ 15 dias), valores provisórios; a mensagem informa quantos dias faltam.
+- **Parte 3 — insumos sazonais:** Fertilizantes e Corretivos com `excesso` > 365 dias e
+  `item_parado` > 180 dias (`// PROVISÓRIO — calibrar com o Victor`). Compras anuais normais de MAP
+  e gesso na base; testes mostram que sem o ajuste elas seriam falsos alarmes, e que o excesso e o
+  item parado plantados continuam disparando.
+- **Parte 4:** `docs/PERGUNTAS_VICTOR.md` (9 blocos de perguntas, valor atual e chave da config).
+- **Parte 5:** `docs/REVISAO.md` (mapa de responsáveis, ficha por arquivo com 3 perguntas da banca,
+  roteiro de 15 minutos e caixa de verificação por pessoa). A coluna "Revisão pela equipe" do
+  README **não** foi preenchida.
 
 ## Testes
-`npm test` na raiz (todos os workspaces): **138 testes, 138 passaram**.
-- `contrato/`: 27 testes (`contrato.test.ts`: válidos e inválidos de cada schema).
-- `web/`: 111 testes (`conformidade.test.ts`, `deteccao.test.ts` — 13 situações, 31 produtos normais,
-  determinismo do gerador —, `motor.test.ts`, `config.test.ts` — três níveis de limites).
+`npm test` na raiz: **170 testes, 170 passaram**.
+- `contrato/`: 27 (`contrato.test.ts`).
+- `web/`: 143 em 4 arquivos — `conformidade.test.ts` (R1–R8, contrato, filtros), `deteccao.test.ts`
+  (13 situações, 40 produtos normais, catálogo do Anexo III, determinismo do gerador),
+  `motor.test.ts` (módulos, limites de cada detector, consumo zero, embalagem progressiva),
+  `config.test.ts` (três níveis, origem do limite, chaves órfãs, insumos sazonais).
 
-Também passam `npm run typecheck` (os dois workspaces), `oxlint` e `vite build`.
+Também passam `npm run typecheck` (contrato e web), `oxlint` (0 avisos) e `vite build`.
 
-## Decisões tomadas
-- Banco Neon; backend Cloudflare Workers com Hono.
-- Contrato de dados único em `contrato/` (Zod), compartilhado por interface, motor e API; monorepo com npm workspaces.
-- Sem base oficial: demonstração com a base simulada; importador continua com mapeamento configurável.
-- Limites em três níveis (padrão → categoria → produto); produto indexado pelo nome canônico.
-- Interpretações da especificação no motor, todas registradas em `docs/DECISOES.md` (21/10/2026). Principais:
-  níveis de cada tipo de alerta; limites adicionais provisórios em `config.ts` (horizonte de vencimento,
-  janela da retirada atípica, piso do MAD, regras da variação de preço); definição do `valorEnvolvido` de
-  cada tipo; consumo de lotes por validade (FEFO); número ausente compatível na duplicidade.
+## Decisões tomadas (detalhes em `docs/DECISOES.md`)
+- Confiança conta só as saídas da janela (substitui a decisão de 21/10).
+- Consumo zero: cobertura nula, nunca infinita; sem ruptura nem excesso.
+- Avisos de configuração para chaves órfãs de `porProduto`.
+- Embalagem com nível progressivo (60 / 15 dias, provisórios).
+- Limites sazonais para Fertilizantes e Corretivos (365 / 180 dias, provisórios).
+- Base simulada alinhada ao Anexo III; filtros distintos nas três categorias.
 
 ## Regras R1–R8: situação
 | Regra | Implementada | Testada |
 |---|---|---|
-| R1 | Sim — `unidades.ts`, conversão em saldo, consumo, preço e importação | Sim |
-| R2 | Sim — `importacao.ts` (ausentes → `null`; cada linha validada pelo contrato, inválida reportada com motivo), `financeiro.ts` (itens sem preço), `fmtReais` ("sem preço") | Sim |
-| R3 | Sim — `calcularConfianca` na análise; mensagens sem dias com confiança insuficiente | Sim |
-| R4 | Sim — alerta estruturado; `gerarMensagem` monta a mensagem a partir dos campos | Sim |
+| R1 | Sim — `unidades.ts`; conversão em saldo, consumo, preço e importação | Sim |
+| R2 | Sim — ausentes → `null` na importação e no contrato; linha inválida reportada com motivo; resumo financeiro conta itens sem preço; "sem preço" e "sem consumo recente" na exibição | Sim |
+| R3 | Sim — confiança calculada na análise com as saídas da janela; sem dias quando insuficiente | Sim |
+| R4 | Sim — alerta estruturado (validado pelo contrato); mensagem gerada dos campos; regra e evidência informam a origem do limite | Sim |
 | R5 | Sim — `ordenarAlertas` (nível, depois maior valor envolvido) | Sim |
-| R6 | Sim — `analisar` puro, sem persistência; `hoje` é parâmetro | Sim |
-| R7 | Sim — toda movimentação aponta para uma `importacao` com origem; `analisar` recusa movimentação sem importação e informa `origens`; toda linha da base traz `SIMULADO`. Falta a UI mostrar a origem (a demonstração usa a base simulada) | Sim (motor) |
-| R8 | Sim — `produtos.ts`: sugestão sem unificação automática, alerta de duplicidade (inclusive erro de digitação), recusa de números diferentes | Sim |
+| R6 | Sim — `analisar` puro; `hoje` é parâmetro; nada persistido | Sim |
+| R7 | Sim — toda movimentação aponta para uma importação com origem; base marcada SIMULADO. Falta a UI mostrar a origem | Sim (motor) |
+| R8 | Sim — sugestão sem unificação automática; números diferentes nunca se unem; filtros distintos | Sim |
 
 ## Apoio de IA nesta sessão
-- Claude Code escreveu todo o código do motor de análise, a base simulada, o gerador e os testes,
-  a partir do `CLAUDE.md` e das instruções da sessão 2 preparadas no Projeto do claude.ai.
-- Claude Code registrou as decisões de interpretação em `docs/DECISOES.md` e atualizou o README.
-- Claude Code criou o pacote `contrato/` (schemas Zod e testes) e migrou o motor e o importador para ele (adendo).
-- Claude Code reescreveu o gerador da base simulada (44 produtos, 12 meses) e refinou a heurística de duplicidade (adendo sem base oficial).
-- Claude Code reorganizou os limites em três níveis e escreveu os testes de precedência.
-- Pendente: revisão humana do código e dos limites (coluna "Revisão pela equipe" do README).
+- Claude Code implementou as partes 1 a 3 e o adendo (código, base simulada e testes) e escreveu
+  `PERGUNTAS_VICTOR.md`, `REVISAO.md` e as entradas do `DECISOES.md`, a partir das instruções da
+  sessão 3 preparadas no Projeto do claude.ai.
+- O `REVISAO.md` foi escrito pela IA para orientar a revisão; as respostas da banca devem ser
+  confirmadas por cada responsável ao ler o próprio código.
+- Pendente: revisão humana (caixas de verificação do `REVISAO.md` e coluna do README).
 
 ## Pendências e bloqueios
 - Base oficial de dados: Organização não fornecerá a base; confirmação formal pendente.
 - Prazo de entrega do repositório: não divulgado.
-- Limites dos alertas (`web/src/analise/config.ts`): provisórios, aguardando calibração do Victor;
-  `porCategoria` pronto e vazio para ele preencher.
-- Provisionamento: conta Neon e conta Cloudflare a cargo do Leonardo (variáveis de ambiente
-  serão fornecidas como secrets do Codespaces, nunca commitadas).
-- Nomes de produtos da base simulada: o texto do Anexo III não estava disponível nesta sessão;
-  foram usados nomes comuns de insumos para cada categoria. Conferir com o anexo.
-- Para o Victor: níveis de cada alerta, prazo de devolução de embalagem (provisório: 365 dias da
-  compra) e se adubos sazonais (usados uma vez por safra) devem ficar fora do alerta de item parado.
+- Calibração com o Victor: responder `docs/PERGUNTAS_VICTOR.md` (todos os limites são provisórios).
+- Alerta de tempo de armazenamento de sementes (extra do Victor): não implementado; depende da pergunta 4.
+- Devolução de embalagem: o modelo não registra a devolução; depois do prazo o alerta some (pergunta 5.3).
+- Níveis fixos no código para 8 dos 10 tipos de alerta; passar para a config se o Victor pedir mudanças (pergunta 8).
+- Revisão humana: cada integrante seguir o roteiro do `docs/REVISAO.md`.
+- Provisionamento: conta Neon e conta Cloudflare a cargo do Leonardo (secrets do Codespaces, nunca commitados).
 - Próximas prioridades (CLAUDE.md, seção 9): painel do dono, tela do funcionário, sincronização.
