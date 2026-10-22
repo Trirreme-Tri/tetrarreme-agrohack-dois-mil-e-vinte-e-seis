@@ -6,7 +6,7 @@ import { CONFIG_PADRAO, resolverLimites } from '../src/analise/config.ts'
 import type { ConfigAnalise } from '../src/analise/config.ts'
 import { HOJE_SIMULADO, carregarBaseSimulada } from './apoio.ts'
 
-const fertilizante = { nome_canonico: 'Superfosfato simples', categoria: 'Fertilizantes' as const }
+const fertilizante = { nome_canonico: 'MAP (fosfato monoamônico)', categoria: 'Fertilizantes' as const }
 const outroFertilizante = { nome_canonico: 'Ureia', categoria: 'Fertilizantes' as const }
 const combustivel = { nome_canonico: 'Óleo diesel S10', categoria: 'Combustíveis e lubrificantes' as const }
 
@@ -33,7 +33,7 @@ describe('Configuração em três níveis', () => {
   test('o produto sobrepõe a categoria, que sobrepõe o padrão (o mais específico vence)', () => {
     const config = comAjustes({
       porCategoria: { Fertilizantes: { excesso: { coberturaMinimaDias: 240 }, janelaConsumoDias: 90 } },
-      porProduto: { 'superfosfato SIMPLES': { excesso: { coberturaMinimaDias: 365 } } },
+      porProduto: { 'map (FOSFATO monoamonico)': { excesso: { coberturaMinimaDias: 365 } } },
     })
     const limites = resolverLimites(fertilizante, config)
     expect(limites.excesso.coberturaMinimaDias).toBe(365) // produto
@@ -57,28 +57,28 @@ describe('O motor usa o nível mais específico', () => {
     analisar(base.movimentacoes, base.produtosNovos, HOJE_SIMULADO, { config }).alertas.map((a) => `${nomeDe.get(a.produtoId)} | ${a.tipo}`)
 
   test('ajuste de categoria muda o alerta de todos os produtos dela', () => {
-    expect(alertasCom(CONFIG_PADRAO)).toContain('Superfosfato simples | excesso')
-    const config = comAjustes({ porCategoria: { Fertilizantes: { excesso: { coberturaMinimaDias: 400 } } }, porProduto: {} })
-    expect(alertasCom(config)).not.toContain('Superfosfato simples | excesso')
+    expect(alertasCom(CONFIG_PADRAO)).toContain('Óleo hidráulico | excesso')
+    const config = comAjustes({ porCategoria: { 'Combustíveis e lubrificantes': { excesso: { coberturaMinimaDias: 600 } } }, porProduto: {} })
+    expect(alertasCom(config)).not.toContain('Óleo hidráulico | excesso')
   })
 
   test('ajuste de produto vale só para ele e aparece na regra do alerta', () => {
-    const config = comAjustes({ porCategoria: {}, porProduto: { 'Glifosato 480': { rupturaPrevista: { coberturaMaximaDias: 15 } } } })
-    expect(alertasCom(config)).not.toContain('Glifosato 480 | ruptura_prevista')
-    const comMaisFolga = comAjustes({ porCategoria: {}, porProduto: { 'Glifosato 480': { estoqueCritico: { coberturaMaximaDias: 21 } } } })
+    const config = comAjustes({ porCategoria: {}, porProduto: { 'Herbicida glifosato 480': { rupturaPrevista: { coberturaMaximaDias: 15 } } } })
+    expect(alertasCom(config)).not.toContain('Herbicida glifosato 480 | ruptura_prevista')
+    const comMaisFolga = comAjustes({ porCategoria: {}, porProduto: { 'Herbicida glifosato 480': { estoqueCritico: { coberturaMaximaDias: 21 } } } })
     const r = analisar(base.movimentacoes, base.produtosNovos, HOJE_SIMULADO, { config: comMaisFolga })
-    const glifosato = r.alertas.find((a) => nomeDe.get(a.produtoId) === 'Glifosato 480')!
+    const glifosato = r.alertas.find((a) => nomeDe.get(a.produtoId) === 'Herbicida glifosato 480')!
     expect(glifosato.tipo).toBe('estoque_critico')
     expect(glifosato.regra).toContain('menos de 21 dias')
     // Os demais produtos continuam com o padrão.
     expect(alertasCom(comMaisFolga).filter((a) => a.endsWith('estoque_critico')).sort()).toEqual([
-      'Cloreto de potássio | estoque_critico', 'Filtro de óleo do motor | estoque_critico', 'Glifosato 480 | estoque_critico',
+      'Cloreto de potássio (KCl) | estoque_critico', 'Filtro de óleo do trator | estoque_critico', 'Herbicida glifosato 480 | estoque_critico',
     ])
   })
 
   test('item parado: categoria pode alongar o prazo sem retirada (ex.: insumos de safra)', () => {
     expect(alertasCom(CONFIG_PADRAO)).toContain('Calcário dolomítico | item_parado')
-    const config = comAjustes({ porCategoria: { Corretivos: { itemParado: { diasSemSaida: 240 } } }, porProduto: {} })
+    const config = comAjustes({ porCategoria: { Corretivos: { itemParado: { diasSemSaida: 365 } } }, porProduto: {} })
     expect(alertasCom(config)).not.toContain('Calcário dolomítico | item_parado')
   })
 })

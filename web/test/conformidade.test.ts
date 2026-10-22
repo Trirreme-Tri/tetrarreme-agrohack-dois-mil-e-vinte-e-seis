@@ -140,7 +140,7 @@ describe('R2 — ausência de validade ou preço não é zero', () => {
   test('R2: o resumo financeiro da base simulada informa os itens sem preço', () => {
     expect(resultadoBase.resumoFinanceiro.itensSemPreco).toBe(1)
     const semPreco = resultadoBase.resumoFinanceiro.porProduto.filter((p) => p.valor === null).map((p) => p.nome)
-    expect(semPreco).toEqual(['Conector para mangueira 16 mm'])
+    expect(semPreco).toEqual(['Conector de linha 16 mm'])
     const categoria = resultadoBase.resumoFinanceiro.porCategoria.find((c) => c.categoria === 'Materiais de irrigação')!
     expect(categoria.itensSemPreco).toBe(1)
   })
@@ -172,7 +172,7 @@ describe('R3 — pouco histórico comunica incerteza', () => {
   })
 
   test('R3: com confiança insuficiente, o alerta não mostra número de dias', () => {
-    const filtro = resultadoBase.alertas.find((a) => nomeDe(a.produtoId) === 'Filtro de óleo do motor')!
+    const filtro = resultadoBase.alertas.find((a) => nomeDe(a.produtoId) === 'Filtro de óleo do trator')!
     expect(filtro.confianca).toBe('insuficiente')
     expect(filtro.evidencia.coberturaDias).toBeNull()
     expect(filtro.mensagem).toContain('Não há histórico suficiente')
@@ -206,7 +206,7 @@ describe('R4 — todo alerta tem justificativa compreensível', () => {
   })
 
   test('R4: mensagem no estilo do exemplo do edital', () => {
-    const kcl = resultadoBase.alertas.find((a) => nomeDe(a.produtoId) === 'Cloreto de potássio')!
+    const kcl = resultadoBase.alertas.find((a) => nomeDe(a.produtoId) === 'Cloreto de potássio (KCl)')!
     expect(kcl.mensagem).toMatch(
       /^Estoque crítico: .*Mantendo o consumo médio recente, o saldo atual poderá ser suficiente por aproximadamente \d+ dias\.$/,
     )
@@ -250,7 +250,7 @@ describe('R6 — atualização gera reanálise', () => {
   test('R6: nova movimentação muda o resultado, e nada fica guardado entre análises', () => {
     const movs = congelar([...base.movimentacoes])
     const produtos = congelar([...base.produtosNovos])
-    const kcl = produtos.find((p) => p.nome_canonico === 'Cloreto de potássio')!
+    const kcl = produtos.find((p) => p.nome_canonico === 'Cloreto de potássio (KCl)')!
     const temCritico = (r: ReturnType<typeof analisar>) => r.alertas.some((a) => a.tipo === 'estoque_critico' && a.produtoId === kcl.id)
 
     const antes = analisar(movs, produtos, HOJE_SIMULADO)
@@ -338,12 +338,12 @@ describe('R8 — produtos com nomes diferentes', () => {
     const ureia = base.produtosNovos.find((p) => p.nome_canonico === 'Ureia')!
     const ureia45 = base.produtosNovos.find((p) => p.nome_canonico === 'UREIA 45%')!
     expect(ureia45.id).not.toBe(ureia.id)
-    const glifosato = base.produtosNovos.find((p) => p.nome_canonico === 'Glifosato 480')!
-    const glifozato = base.produtosNovos.find((p) => p.nome_canonico === 'Glifozato 480')!
+    const glifosato = base.produtosNovos.find((p) => p.nome_canonico === 'Herbicida glifosato 480')!
+    const glifozato = base.produtosNovos.find((p) => p.nome_canonico === 'Herbicida glifozato 480')!
     expect(glifozato.id).not.toBe(glifosato.id)
     expect(base.sugestoesUnificacao).toEqual([
       { nomeNovo: 'UREIA 45%', produtoNovoId: ureia45.id, candidatos: [{ produtoId: ureia.id, nome: 'Ureia' }] },
-      { nomeNovo: 'Glifozato 480', produtoNovoId: glifozato.id, candidatos: [{ produtoId: glifosato.id, nome: 'Glifosato 480' }] },
+      { nomeNovo: 'Herbicida glifozato 480', produtoNovoId: glifozato.id, candidatos: [{ produtoId: glifosato.id, nome: 'Herbicida glifosato 480' }] },
     ])
   })
 
@@ -363,7 +363,18 @@ describe('R8 — produtos com nomes diferentes', () => {
   test('R8: possível duplicidade gera alerta; pares parecidos de produtos diferentes não geram', () => {
     const duplicidades = resultadoBase.alertas.filter((a) => a.tipo === 'possivel_duplicidade')
     const pares = duplicidades.map((a) => `${nomeDe(a.produtoId)} ~ ${a.evidencia.outroProduto}`).sort()
-    expect(pares).toEqual(['Glifozato 480 ~ Glifosato 480', 'UREIA 45% ~ Ureia'])
+    expect(pares).toEqual(['Herbicida glifozato 480 ~ Herbicida glifosato 480', 'UREIA 45% ~ Ureia'])
+  })
+
+  test('R8: os três "filtros" do Anexo III são produtos distintos e nunca são sugeridos para unificação', () => {
+    const nomes = ['Filtro de óleo do trator', 'Filtro de disco para irrigação', 'Filtro para respirador']
+    const filtros = nomes.map((n) => base.produtosNovos.find((p) => p.nome_canonico === n)!)
+    expect(new Set(filtros.map((f) => f.id)).size).toBe(3)
+    expect(new Set(filtros.map((f) => f.categoria))).toEqual(new Set(['Peças e manutenção', 'Materiais de irrigação', 'EPI e diversos']))
+    expect(sugerirDuplicidades(filtros, CONFIG_PADRAO.globais.duplicidade)).toEqual([])
+    for (const n of nomes) expect(sugerirProdutos(n, filtros.filter((f) => f.nome_canonico !== n), CONFIG_PADRAO.globais.duplicidade)).toEqual([])
+    const alertasDeFiltro = resultadoBase.alertas.filter((a) => a.tipo === 'possivel_duplicidade' && nomes.includes(nomeDe(a.produtoId)))
+    expect(alertasDeFiltro).toEqual([])
   })
 
   test('R8: palavras diferentes não viram duplicidade, mesmo com nomes parecidos', () => {

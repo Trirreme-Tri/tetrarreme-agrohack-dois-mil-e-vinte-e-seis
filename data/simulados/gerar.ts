@@ -21,6 +21,49 @@ const SEMENTE = 20261029
 
 export type NivelAlerta = 'critico' | 'atencao' | 'informativo'
 
+/** Exemplos do Anexo III (CLAUDE.md, seção 5) e o produto que representa cada um na base. */
+export const ANEXO_III: { categoria: string; exemplo: string; produto: string }[] = [
+  ...([
+    ['Ureia', 'Ureia'], ['KCl', 'Cloreto de potássio (KCl)'], ['MAP', 'MAP (fosfato monoamônico)'],
+    ['NPK 04-14-08', 'NPK 04-14-08'], ['NPK 10-10-10', 'NPK 10-10-10'], ['NPK 04-30-16', 'NPK 04-30-16'],
+    ['Sulfato de amônio', 'Sulfato de amônio'], ['FTE BR-12', 'FTE BR-12'],
+  ] as const).map(([exemplo, produto]) => ({ categoria: 'Fertilizantes', exemplo, produto })),
+  ...([['Calcário dolomítico', 'Calcário dolomítico'], ['Gesso agrícola', 'Gesso agrícola']] as const)
+    .map(([exemplo, produto]) => ({ categoria: 'Corretivos', exemplo, produto })),
+  ...([
+    ['Milho', 'Semente de milho híbrido'], ['Soja', 'Semente de soja'], ['Feijão', 'Semente de feijão'],
+    ['Braquiária', 'Semente de braquiária'],
+  ] as const).map(([exemplo, produto]) => ({ categoria: 'Sementes', exemplo, produto })),
+  ...([
+    ['Herbicidas', 'Herbicida glifosato 480'], ['Herbicidas', 'Herbicida 2,4-D'],
+    ['Fungicidas', 'Fungicida azoxistrobina'], ['Fungicidas', 'Fungicida mancozebe'],
+    ['Inseticidas', 'Inseticida lambda-cialotrina'], ['Inseticidas', 'Inseticida biológico Bacillus thuringiensis'],
+    ['Adjuvante', 'Adjuvante óleo mineral'], ['Trichoderma', 'Trichoderma harzianum'],
+    ['Azospirillum', 'Azospirillum brasilense'], ['Inoculante', 'Inoculante para soja'],
+  ] as const).map(([exemplo, produto]) => ({ categoria: 'Defensivos e biológicos', exemplo, produto })),
+  ...([
+    ['Óleo diesel S10', 'Óleo diesel S10'], ['Óleo de motor', 'Óleo de motor 15W40'],
+    ['Óleo hidráulico', 'Óleo hidráulico'], ['Graxa', 'Graxa para rolamentos'],
+  ] as const).map(([exemplo, produto]) => ({ categoria: 'Combustíveis e lubrificantes', exemplo, produto })),
+  ...([
+    ['Filtros', 'Filtro de óleo do trator'], ['Correias', 'Correia do alternador'], ['Rolamentos', 'Rolamento 6205'],
+    ['Bicos de pulverização', 'Bico de pulverização leque 110-02'], ['Mangueiras', 'Mangueira hidráulica 1/2 pol'],
+    ['Parafusos', 'Parafuso sextavado M12'], ['Discos de corte', 'Disco de corte para esmerilhadeira'],
+    ['Eletrodos', 'Eletrodo de solda 2,5 mm'],
+  ] as const).map(([exemplo, produto]) => ({ categoria: 'Peças e manutenção', exemplo, produto })),
+  ...([
+    ['Tubos PVC', 'Tubo PVC 50 mm'], ['Mangueira de gotejamento', 'Mangueira de gotejamento 16 mm'],
+    ['Conectores', 'Conector de linha 16 mm'], ['Filtros', 'Filtro de disco para irrigação'],
+    ['Registros', 'Registro de esfera 32 mm'],
+  ] as const).map(([exemplo, produto]) => ({ categoria: 'Materiais de irrigação', exemplo, produto })),
+  ...([
+    ['Luvas', 'Luva nitrílica'], ['Respiradores', 'Respirador PFF2'], ['Filtros', 'Filtro para respirador'],
+    ['Óculos', 'Óculos de proteção'], ['Aventais', 'Avental impermeável'], ['Botas', 'Bota de borracha'],
+    ['Sacos', 'Saco de ráfia 60 kg'], ['Etiquetas', 'Etiqueta de identificação'], ['Fitas', 'Fita de sinalização'],
+    ['Estacas', 'Estaca de madeira'],
+  ] as const).map(([exemplo, produto]) => ({ categoria: 'EPI e diversos', exemplo, produto })),
+]
+
 export interface Situacao {
   numero: number
   produto: string
@@ -47,6 +90,8 @@ export interface BaseSimulada {
   situacoes: Situacao[]
   normais: ProdutoNormal[]
   secundarios: AlertaSecundario[]
+  /** Produtos fora do Anexo III, existentes só para manter situações plantadas. */
+  extras: string[]
   totalProdutos: number
   totalMovimentacoes: number
   categorias: string[]
@@ -220,9 +265,11 @@ export function gerarBase(): BaseSimulada {
 
   // ======================================================================
   // PRODUTOS NORMAIS — não devem gerar nenhum alerta
+  // Catálogo = todos os exemplos do Anexo III (CLAUDE.md, seção 5); itens genéricos especificados.
   // ======================================================================
 
-  // ---- Combustíveis e lubrificantes
+  // ---- Combustíveis e lubrificantes (Anexo III: óleo diesel S10; óleo de motor; óleo hidráulico; graxa)
+  //      Óleo hidráulico e graxa são situações plantadas (abaixo).
   {
     const p = produto('Óleo diesel S10', 'Combustíveis e lubrificantes', 500)
     consumoContinuo(p, { unidade: 'L', intervalo: 3, quantidade: 100, preco: 6.1, fornecedor: 'Posto Gama', destinos: ['Trator 1', 'Trator 2', 'Gerador'], lote: 'DSL' })
@@ -231,27 +278,13 @@ export function gerarBase(): BaseSimulada {
     normal(p.nome, 'Consumo estável (~33 L/dia) com recompra regular; inclui um ajuste de inventário de −20 L')
   }
   {
-    const p = produto('Gasolina comum', 'Combustíveis e lubrificantes', 20)
-    consumoContinuo(p, { unidade: 'L', intervalo: 7, quantidade: 20, preco: 6.4, fornecedor: 'Posto Gama', destinos: ['Roçadeira', 'Motobomba'] })
-    normal(p.nome, 'Consumo semanal estável (roçadeira e motobomba)')
-  }
-  {
-    const p = produto('Óleo lubrificante 15W40', 'Combustíveis e lubrificantes', 20)
+    const p = produto('Óleo de motor 15W40', 'Combustíveis e lubrificantes', 20)
     consumoContinuo(p, { unidade: 'L', intervalo: 7, quantidade: 4, casas: 1, preco: 24.9, fornecedor: 'Revenda Agrícola Alfa', destinos: ['Oficina'] })
     normal(p.nome, 'Troca semanal estável')
   }
-  {
-    const p = produto('Fluido hidráulico', 'Combustíveis e lubrificantes', 10)
-    consumoContinuo(p, { unidade: 'L', intervalo: 10, quantidade: 5, casas: 1, preco: 18.5, fornecedor: 'Revenda Agrícola Alfa', destinos: ['Trator 1', 'Trator 2'] })
-    normal(p.nome, 'Reposição estável a cada 10 dias')
-  }
-  {
-    const p = produto('Arla 32', 'Combustíveis e lubrificantes', 30)
-    consumoContinuo(p, { unidade: 'L', intervalo: 5, quantidade: 10, preco: 3.8, fornecedor: 'Posto Gama', destinos: ['Trator 1', 'Trator 2'] })
-    normal(p.nome, 'Consumo estável acompanhando o diesel')
-  }
 
-  // ---- EPI e diversos
+  // ---- EPI e materiais diversos (Anexo III: luvas; respiradores; filtros; óculos; aventais; botas;
+  //      sacos; etiquetas; fitas; estacas)
   {
     const p = produto('Luva nitrílica', 'EPI e diversos', 20)
     // Toda 3ª compra chega sem preço na nota ("N/D"): R2, ausente nunca vira zero.
@@ -262,14 +295,14 @@ export function gerarBase(): BaseSimulada {
     normal(p.nome, 'Consumo estável; algumas compras sem preço ("N/D"), que não viram zero')
   }
   {
-    const p = produto('Máscara PFF2', 'EPI e diversos', 10)
+    const p = produto('Respirador PFF2', 'EPI e diversos', 10)
     consumoContinuo(p, { unidade: 'un', intervalo: 3, quantidade: 2, preco: 3.5, fornecedor: 'Revenda Agrícola Alfa', destinos: ['Pulverização'] })
-    normal(p.nome, 'Consumo estável. "PFF2" tem número: não é confundida com outros EPIs')
+    normal(p.nome, 'Consumo estável')
   }
   {
-    const p = produto('Macacão de proteção', 'EPI e diversos', 2)
-    consumoContinuo(p, { unidade: 'un', intervalo: 10, quantidade: 1, preco: 85, fornecedor: 'Revenda Agrícola Alfa', destinos: ['Pulverização'] })
-    normal(p.nome, 'Troca regular a cada 10 dias')
+    const p = produto('Filtro para respirador', 'EPI e diversos', 4)
+    consumoContinuo(p, { unidade: 'un', intervalo: 7, quantidade: 2, preco: 9.5, fornecedor: 'Revenda Agrícola Alfa', destinos: ['Pulverização'] })
+    normal(p.nome, 'Troca semanal. Um dos três "filtros" do Anexo III: produto distinto, **não** é duplicidade dos outros dois (R8)')
   }
   {
     const p = produto('Óculos de proteção', 'EPI e diversos', 2)
@@ -277,33 +310,74 @@ export function gerarBase(): BaseSimulada {
     normal(p.nome, 'Troca regular a cada 10 dias')
   }
   {
+    const p = produto('Avental impermeável', 'EPI e diversos', 2)
+    consumoContinuo(p, { unidade: 'un', intervalo: 10, quantidade: 1, preco: 35, fornecedor: 'Revenda Agrícola Alfa', destinos: ['Preparo de calda'] })
+    normal(p.nome, 'Troca regular a cada 10 dias')
+  }
+  {
+    const p = produto('Bota de borracha', 'EPI e diversos', 2)
+    consumoContinuo(p, { unidade: 'un', intervalo: 10, quantidade: 1, preco: 60, fornecedor: 'Revenda Agrícola Alfa', destinos: ['Equipe de campo'] })
+    normal(p.nome, 'Reposição regular para a equipe')
+  }
+  {
     const p = produto('Saco de ráfia 60 kg', 'EPI e diversos', 20)
     consumoContinuo(p, { unidade: 'un', intervalo: 3, quantidade: 5, preco: 1.1, fornecedor: 'Revenda Agrícola Alfa', destinos: ['Galpão'] })
     normal(p.nome, 'Consumo estável no galpão')
   }
-
-  // ---- Materiais de irrigação
   {
-    const p = produto('Conector para mangueira 16 mm', 'Materiais de irrigação', 5)
+    const p = produto('Etiqueta de identificação', 'EPI e diversos', 50)
+    consumoContinuo(p, { unidade: 'un', intervalo: 3, quantidade: 20, preco: 0.15, fornecedor: 'Revenda Agrícola Alfa', destinos: ['Galpão'] })
+    normal(p.nome, 'Consumo estável (identificação de lotes e sacarias)')
+  }
+  {
+    const p = produto('Fita de sinalização', 'EPI e diversos', 2)
+    consumoContinuo(p, { unidade: 'un', intervalo: 10, quantidade: 1, preco: 18, fornecedor: 'Revenda Agrícola Alfa', destinos: ['Área de aplicação'] })
+    normal(p.nome, 'Rolo trocado a cada 10 dias')
+  }
+  {
+    const p = produto('Estaca de madeira', 'EPI e diversos', 20)
+    consumoContinuo(p, { unidade: 'un', intervalo: 5, quantidade: 10, preco: 4.5, fornecedor: 'Revenda Agrícola Alfa', destinos: ['Cercas e marcação de talhão'] })
+    normal(p.nome, 'Reposição estável')
+  }
+
+  // ---- Materiais de irrigação (Anexo III: tubos PVC; mangueira de gotejamento; conectores; filtros; registros)
+  {
+    const p = produto('Tubo PVC 50 mm', 'Materiais de irrigação', 4)
+    consumoContinuo(p, { unidade: 'un', intervalo: 10, quantidade: 2, preco: 48, fornecedor: 'Loja de Peças Delta', destinos: ['Irrigação talhão 3'] })
+    normal(p.nome, 'Reposição regular de barras')
+  }
+  {
+    const p = produto('Mangueira de gotejamento 16 mm', 'Materiais de irrigação', 2)
+    consumoContinuo(p, { unidade: 'un', intervalo: 10, quantidade: 1, preco: 380, fornecedor: 'Loja de Peças Delta', destinos: ['Irrigação talhão 3'] })
+    normal(p.nome, 'Reposição regular de rolos na área irrigada')
+  }
+  {
+    const p = produto('Conector de linha 16 mm', 'Materiais de irrigação', 5)
     // Nenhuma compra tem preço ("-"): o item aparece como "sem preço" no resumo financeiro (R2).
     consumoContinuo(p, { unidade: 'un', intervalo: 7, quantidade: 2, preco: null, fornecedor: 'Loja de Peças Delta', destinos: ['Irrigação talhão 3'] })
     normal(p.nome, 'Consumo estável; nenhuma compra com preço (conta como "sem preço" no resumo financeiro)')
+  }
+  {
+    const p = produto('Filtro de disco para irrigação', 'Materiais de irrigação', 1)
+    consumoContinuo(p, { unidade: 'un', intervalo: 10, quantidade: 1, preco: 140, fornecedor: 'Loja de Peças Delta', destinos: ['Cabeçal de irrigação'] })
+    normal(p.nome, 'Troca regular. Um dos três "filtros" do Anexo III: produto distinto, **não** é duplicidade dos outros dois (R8)')
   }
   {
     const p = produto('Registro de esfera 32 mm', 'Materiais de irrigação', 2)
     consumoContinuo(p, { unidade: 'un', intervalo: 10, quantidade: 1, preco: 22, fornecedor: 'Loja de Peças Delta', destinos: ['Irrigação talhão 3'] })
     normal(p.nome, 'Reposição regular')
   }
-  {
-    const p = produto('Fita gotejadora (rolo)', 'Materiais de irrigação', 2)
-    consumoContinuo(p, { unidade: 'un', intervalo: 10, quantidade: 1, preco: 380, fornecedor: 'Loja de Peças Delta', destinos: ['Irrigação talhão 3'] })
-    normal(p.nome, 'Reposição regular de rolos na área irrigada')
-  }
 
-  // ---- Peças e manutenção
+  // ---- Peças e manutenção (Anexo III: filtros; correias; rolamentos; bicos de pulverização; mangueiras;
+  //      parafusos; discos de corte; eletrodos). O filtro de óleo é situação plantada (abaixo).
   {
-    const p = produto('Elemento filtrante de ar', 'Peças e manutenção', 2)
-    consumoContinuo(p, { unidade: 'un', intervalo: 10, quantidade: 1, preco: 120, fornecedor: 'Loja de Peças Delta', destinos: ['Trator 1', 'Trator 2'] })
+    const p = produto('Correia do alternador', 'Peças e manutenção', 2)
+    consumoContinuo(p, { unidade: 'un', intervalo: 10, quantidade: 1, preco: 65, fornecedor: 'Loja de Peças Delta', destinos: ['Trator 1', 'Trator 2'] })
+    normal(p.nome, 'Troca regular')
+  }
+  {
+    const p = produto('Rolamento 6205', 'Peças e manutenção', 2)
+    consumoContinuo(p, { unidade: 'un', intervalo: 10, quantidade: 1, preco: 28, fornecedor: 'Loja de Peças Delta', destinos: ['Plantadeira', 'Grade'] })
     normal(p.nome, 'Troca regular')
   }
   {
@@ -312,36 +386,41 @@ export function gerarBase(): BaseSimulada {
     normal(p.nome, 'Troca semanal estável')
   }
   {
-    const p = produto('Lâmina de roçadeira', 'Peças e manutenção', 2)
-    consumoContinuo(p, { unidade: 'un', intervalo: 10, quantidade: 1, preco: 45, fornecedor: 'Loja de Peças Delta', destinos: ['Roçadeira'] })
-    normal(p.nome, 'Troca regular')
-  }
-
-  // ---- Fertilizantes de uso contínuo (fertirrigação e foliar)
-  {
-    const p = produto('Nitrato de cálcio', 'Fertilizantes', 100)
-    consumoContinuo(p, { unidade: 'kg', intervalo: 7, quantidade: 25, preco: 4.8, fornecedor: 'Cooperativa Beta', destinos: ['Fertirrigação talhão 3'] })
-    normal(p.nome, 'Fertirrigação semanal estável')
+    const p = produto('Mangueira hidráulica 1/2 pol', 'Peças e manutenção', 2)
+    consumoContinuo(p, { unidade: 'un', intervalo: 10, quantidade: 1, preco: 95, fornecedor: 'Loja de Peças Delta', destinos: ['Trator 1', 'Trator 2'] })
+    normal(p.nome, 'Troca regular. **Não** é duplicidade da mangueira de gotejamento (palavras e números diferentes)')
   }
   {
-    const p = produto('Adubo foliar com boro', 'Fertilizantes', 10)
-    consumoContinuo(p, { unidade: 'L', intervalo: 10, quantidade: 5, casas: 1, preco: 14, fornecedor: 'Cooperativa Beta', destinos: ['Pulverizador'] })
-    normal(p.nome, 'Aplicação foliar regular')
+    const p = produto('Parafuso sextavado M12', 'Peças e manutenção', 20)
+    consumoContinuo(p, { unidade: 'un', intervalo: 7, quantidade: 10, preco: 1.8, fornecedor: 'Loja de Peças Delta', destinos: ['Oficina'] })
+    normal(p.nome, 'Consumo estável na oficina')
+  }
+  {
+    const p = produto('Disco de corte para esmerilhadeira', 'Peças e manutenção', 4)
+    consumoContinuo(p, { unidade: 'un', intervalo: 7, quantidade: 2, preco: 12, fornecedor: 'Loja de Peças Delta', destinos: ['Oficina'] })
+    normal(p.nome, 'Consumo estável na oficina')
+  }
+  {
+    const p = produto('Eletrodo de solda 2,5 mm', 'Peças e manutenção', 2)
+    consumoContinuo(p, { unidade: 'kg', intervalo: 10, quantidade: 1, casas: 1, preco: 38, fornecedor: 'Loja de Peças Delta', destinos: ['Oficina'] })
+    normal(p.nome, 'Consumo regular na oficina')
   }
 
-  // ---- Defensivos e biológicos de uso contínuo: uma compra no ano, um lote só
+  // ---- Defensivos e biológicos de uso contínuo (Anexo III: herbicidas; fungicidas; inseticidas; adjuvante;
+  //      Trichoderma; Azospirillum; inoculante). Uma compra no ano, um lote só (o lote nunca zera).
+  //      Herbicidas, o outro fungicida, o outro inseticida e o inoculante são situações plantadas (abaixo).
   {
     const p = produto('Fungicida mancozebe', 'Defensivos e biológicos')
     compraUnicaContinua(p, { unidade: 'kg', intervalo: 7, quantidade: 3, casas: 1, preco: 32, fornecedor: 'Revenda Agrícola Alfa', destinos: ['Pulverizador'], lote: 'MAN' })
     normal(p.nome, 'Uma compra no ano, uso semanal; lote com validade de 3 anos e saldo para ~90 dias')
   }
   {
-    const p = produto('Óleo mineral adjuvante', 'Defensivos e biológicos')
+    const p = produto('Adjuvante óleo mineral', 'Defensivos e biológicos')
     compraUnicaContinua(p, { unidade: 'L', intervalo: 7, quantidade: 2, casas: 1, preco: 19, fornecedor: 'Revenda Agrícola Alfa', destinos: ['Pulverizador'], lote: 'ADJ' })
     normal(p.nome, 'Uma compra no ano, uso semanal junto da calda')
   }
   {
-    const p = produto('Bacillus thuringiensis', 'Defensivos e biológicos')
+    const p = produto('Inseticida biológico Bacillus thuringiensis', 'Defensivos e biológicos')
     // Biológico em doses fracionadas: compra em L, retiradas em mL (R1).
     compraUnicaContinua(p, { unidade: 'mL', unidadeCompra: 'L', intervalo: 10, quantidade: 800, preco: 65, fornecedor: 'Cooperativa Beta', destinos: ['Pulverizador'], lote: 'BT', validadeAnos: 2 })
     normal(p.nome, 'Biológico comprado em L e retirado em mL (R1); uso regular')
@@ -351,17 +430,29 @@ export function gerarBase(): BaseSimulada {
     compraUnicaContinua(p, { unidade: 'kg', intervalo: 10, quantidade: 1, casas: 1, preco: 55, fornecedor: 'Cooperativa Beta', destinos: ['Talhão 3'], lote: 'TRI', validadeAnos: 2 })
     normal(p.nome, 'Biológico de uso regular')
   }
-
-  // ---- Insumos de safra: entram e saem na época certa (padrões realistas de lavoura)
   {
-    // Adubo de plantio do milho safrinha (fevereiro); sobra pequena.
+    const p = produto('Azospirillum brasilense', 'Defensivos e biológicos')
+    compraUnicaContinua(p, { unidade: 'mL', unidadeCompra: 'L', intervalo: 10, quantidade: 500, preco: 45, fornecedor: 'Cooperativa Beta', destinos: ['Tratamento de sementes'], lote: 'AZO', validadeAnos: 2 })
+    normal(p.nome, 'Biológico comprado em L e retirado em mL (R1); uso regular')
+  }
+
+  // ---- Fertilizantes (Anexo III: ureia; KCl; MAP; NPK 04-14-08; NPK 10-10-10; NPK 04-30-16;
+  //      sulfato de amônio; FTE BR-12). KCl e NPK 04-14-08 são situações plantadas (abaixo).
+  //      Padrão de lavoura: adubo de plantio (NPK 04-30-16 + FTE em fevereiro) e cobertura ~25 dias
+  //      depois (ureia e sulfato de amônio em março).
+  {
     const p = produto('NPK 04-30-16', 'Fertilizantes')
-    p.compra('2025-12-10', 80, 'sc 50 kg', '172,00', 'Cooperativa Beta', 'NPK0430-2512')
-    p.retiradas('2026-02-05', '2026-02-23', 2, () => p.perto(350, 30), 'kg', ['Talhão 1', 'Talhão 2'])
-    normal(p.nome, 'Adubo de plantio do milho safrinha (fevereiro); sobra pequena. **Não** é duplicidade de NPK 04-14-08 (números diferentes, R8)')
+    p.compra('2025-12-10', 70, 'sc 50 kg', '172,00', 'Cooperativa Beta', 'NPK0430-2512')
+    p.retiradas('2026-02-05', '2026-02-23', 2, () => 350, 'kg', ['Talhão 1', 'Talhão 2'])
+    normal(p.nome, 'Adubo de plantio do milho safrinha (fevereiro); usado todo (saldo zero). **Não** é duplicidade de NPK 04-14-08 (números diferentes, R8)')
   }
   {
-    // Adubo de cobertura do milho, ~25 dias após o plantio (março).
+    const p = produto('FTE BR-12', 'Fertilizantes')
+    p.compra('2026-01-25', 400, 'kg', '9,00', 'Cooperativa Beta', 'FTE-2601')
+    p.retiradas('2026-02-05', '2026-02-19', 2, () => 50, 'kg', ['Talhão 1', 'Talhão 2'])
+    normal(p.nome, 'Micronutrientes aplicados com o adubo de plantio (fevereiro); usado todo (saldo zero)')
+  }
+  {
     const p = produto('Ureia', 'Fertilizantes')
     p.compra('2026-02-20', 60, 'sc 50 kg', '145,00', 'Cooperativa Beta', 'URE-2602')
     p.retiradas('2026-03-02', '2026-03-20', 2, () => 250, 'kg', ['Talhão 1', 'Talhão 2'])
@@ -373,6 +464,27 @@ export function gerarBase(): BaseSimulada {
     p.retiradas('2026-03-05', '2026-03-23', 2, () => 200, 'kg', ['Talhão 3'])
     normal(p.nome, 'Cobertura do milho em março; usado todo (saldo zero)')
   }
+  {
+    const p = produto('NPK 10-10-10', 'Fertilizantes', 100)
+    consumoContinuo(p, { unidade: 'kg', unidadeCompra: 'sc 50 kg', intervalo: 7, quantidade: 50, preco: 150, fornecedor: 'Cooperativa Beta', destinos: ['Horta e pomar'] })
+    normal(p.nome, 'Uso semanal na horta e no pomar (fora da lavoura), com recompra em sacos de 50 kg')
+  }
+  {
+    const p = produto('MAP (fosfato monoamônico)', 'Fertilizantes')
+    p.compra('2025-11-20', 60, 'sc 50 kg', '210,00', 'Cooperativa Beta', 'MAP-2511')
+    p.retiradas('2025-11-25', '2025-12-13', 2, () => 300, 'kg', ['Talhão 3', 'Talhão 4'])
+    normal(p.nome, 'Adubo de plantio da soja de 2025; usado todo (saldo zero)')
+  }
+
+  // ---- Corretivos (Anexo III: calcário dolomítico; gesso agrícola). O calcário é situação plantada.
+  {
+    const p = produto('Gesso agrícola', 'Corretivos')
+    p.compra('2026-06-10', 20, 't', '190,00', 'Revenda Agrícola Alfa')
+    p.retiradas('2026-06-20', '2026-07-18', 7, () => 4, 't', ['Talhão 1', 'Talhão 2', 'Talhão 3', 'Talhão 4', 'Talhão 5'])
+    normal(p.nome, 'Comprado e aplicado todo no inverno (saldo zero)')
+  }
+
+  // ---- Sementes (Anexo III: milho; soja; feijão; braquiária): entram e saem em poucas semanas.
   {
     const p = produto('Semente de milho híbrido', 'Sementes')
     p.compra('2026-01-20', 600, 'kg', '38,00', 'Cooperativa Beta', 'MIL-2601', '2026-08-31')
@@ -386,10 +498,11 @@ export function gerarBase(): BaseSimulada {
     normal(p.nome, 'Plantio de maio; saiu toda (saldo zero)')
   }
   {
-    const p = produto('Semente de crotalária', 'Sementes')
-    p.compra('2026-07-25', 200, 'kg', '15,00', 'Cooperativa Beta', 'CRO-2607', '2027-07-31')
+    const p = produto('Semente de braquiária', 'Sementes')
+    // Braquiária aqui é planta de cobertura (palhada para plantio direto), não pastagem.
+    p.compra('2026-07-25', 200, 'kg', '15,00', 'Cooperativa Beta', 'BRA-2607', '2027-07-31')
     p.retiradas('2026-08-01', '2026-08-13', 3, () => 40, 'kg', ['Talhão 2'])
-    normal(p.nome, 'Adubação verde semeada em agosto; saiu toda (saldo zero)')
+    normal(p.nome, 'Planta de cobertura (palhada para plantio direto), semeada em agosto; saiu toda (saldo zero)')
   }
   {
     const p = produto('Semente de soja', 'Sementes')
@@ -397,18 +510,6 @@ export function gerarBase(): BaseSimulada {
     p.retirada('2026-10-15', 400, 'kg', 'Talhão 4')
     p.retirada('2026-10-18', 400, 'kg', 'Talhão 4')
     normal(p.nome, 'Plantio começando: só 2 retiradas, confiança `insuficiente`, então nenhuma estimativa de dias é feita (R3)')
-  }
-  {
-    const p = produto('Gesso agrícola', 'Corretivos')
-    p.compra('2026-06-10', 20, 't', '190,00', 'Revenda Agrícola Alfa')
-    p.retiradas('2026-06-20', '2026-07-18', 7, () => 4, 't', ['Talhão 1', 'Talhão 2', 'Talhão 3', 'Talhão 4', 'Talhão 5'])
-    normal(p.nome, 'Comprado e aplicado todo no inverno (saldo zero)')
-  }
-  {
-    const p = produto('Calcário calcítico', 'Corretivos')
-    p.compra('2026-07-01', 30, 't', '230,00', 'Revenda Agrícola Alfa')
-    p.retiradas('2026-07-05', '2026-08-02', 7, () => 6, 't', ['Talhão 4', 'Talhão 5'])
-    normal(p.nome, 'Aplicado todo em julho (saldo zero). **Não** é duplicidade de "Calcário dolomítico": só uma palavra em comum (R8)')
   }
 
   // ======================================================================
@@ -419,7 +520,7 @@ export function gerarBase(): BaseSimulada {
   // Como foi plantada: as retiradas (~100 kg a cada 2 dias desde julho) são geradas primeiro e a
   // única compra é dimensionada para sobrar exatamente 250 kg: ~5 dias de consumo e abaixo do mínimo de 1.000 kg.
   {
-    const p = produto('Cloreto de potássio', 'Fertilizantes', 1000)
+    const p = produto('Cloreto de potássio (KCl)', 'Fertilizantes', 1000)
     const saidas: [string, number][] = []
     let total = 0
     for (let d = '2026-07-20'; d <= '2026-10-19'; d = somarDias(d, 2)) {
@@ -434,9 +535,9 @@ export function gerarBase(): BaseSimulada {
 
   // estoque_critico com confiança insuficiente (R3).
   // Como foi plantada: 6 filtros comprados e só 2 retiradas de 2 → saldo 2 ≤ mínimo 4, mas com
-  // menos de 3 retiradas a mensagem não pode mostrar número de dias.
+  // menos de 3 retiradas a mensagem não pode mostrar número de dias. Um dos três "filtros" do Anexo III.
   {
-    const p = produto('Filtro de óleo do motor', 'Peças e manutenção', 4)
+    const p = produto('Filtro de óleo do trator', 'Peças e manutenção', 4)
     p.compra('2026-03-10', 6, 'un', '85,00', 'Loja de Peças Delta')
     p.retirada('2026-06-02', 2, 'un', 'Trator 1')
     p.retirada('2026-09-15', 2, 'un', 'Trator 2')
@@ -446,7 +547,7 @@ export function gerarBase(): BaseSimulada {
   // ruptura_prevista — cobertura entre 7 e 30 dias.
   // Como foi plantada: retiradas de ~12 L a cada 4 dias (~3 L/dia); a compra única deixa 60 L de sobra (~19 dias).
   {
-    const p = produto('Glifosato 480', 'Defensivos e biológicos', 20)
+    const p = produto('Herbicida glifosato 480', 'Defensivos e biológicos', 20)
     const saidas: [string, number][] = []
     let total = 0
     for (let d = '2026-07-05'; d <= '2026-10-19'; d = somarDias(d, 4)) {
@@ -504,23 +605,24 @@ export function gerarBase(): BaseSimulada {
     secundarios.push({ produto: p.nome, tipo: 'consumo_crescente', nivel: 'atencao', motivo: 'a retirada atípica de 2,5 L também eleva o consumo dos últimos 30 dias; é efeito real da retirada, não falso positivo' })
   }
 
-  // excesso — cobertura > 180 dias.
-  // Como foi plantada: compra de 15 t em agosto para um consumo de ~300 kg por semana (~43 kg/dia).
+  // excesso — cobertura > 180 dias (Combustíveis e lubrificantes: categoria sem limite sazonal).
+  // Como foi plantada: compra de 1.000 L (5 tambores) em agosto para um consumo de ~10 L a cada 5 dias
+  // (~2 L/dia): o saldo dá para mais de um ano.
   {
-    const p = produto('Superfosfato simples', 'Fertilizantes')
-    p.compra('2026-08-15', 15, 't', '2100,00', 'Cooperativa Beta', 'SSP-2608')
-    p.retiradas('2026-08-20', '2026-10-19', 7, () => p.perto(300, 30), 'kg', ['Talhão 3'])
-    plantar(p.nome, 'excesso', 'informativo', 'Saldo de 12,3 t para ~300 dias de consumo')
+    const p = produto('Óleo hidráulico', 'Combustíveis e lubrificantes')
+    p.compra('2026-08-10', 1000, 'L', '18,50', 'Revenda Agrícola Alfa', 'HID-2608')
+    p.retiradas('2026-08-15', '2026-10-19', 5, () => p.perto(10, 2), 'L', ['Trator 1', 'Trator 2'])
+    plantar(p.nome, 'excesso', 'informativo', 'Compra de 1.000 L para ~2 L/dia de consumo: saldo para mais de um ano')
   }
 
-  // item_parado — valor no top 20% e sem saída há mais de 60 dias.
-  // Como foi plantada: 150 t compradas em abril, 70 t aplicadas até junho; sobram 80 t (R$ 19.200),
-  // o 2º maior valor em estoque (top 20%), sem retirada desde 28/06.
+  // item_parado — valor no top 20% e sem saída há mais tempo que o limite (180 dias para corretivos).
+  // Como foi plantada: 150 t compradas em novembro de 2025, 70 t aplicadas até 16/12/2025; sobram
+  // 80 t (R$ 19.200) da safra passada, entre os maiores valores em estoque, sem retirada há ~300 dias.
   {
     const p = produto('Calcário dolomítico', 'Corretivos')
-    p.compra('2026-04-10', 150, 't', '240,00', 'Revenda Agrícola Alfa')
-    p.retiradas('2026-05-05', '2026-06-28', 9, () => 10, 't', ['Talhão 1', 'Talhão 2', 'Talhão 3', 'Talhão 4'])
-    plantar(p.nome, 'item_parado', 'informativo', 'R$ 19.200 em estoque (2º maior valor) e nenhuma retirada desde 28/06/2026')
+    p.compra('2025-11-05', 150, 't', '240,00', 'Revenda Agrícola Alfa')
+    p.retiradas('2025-11-10', '2025-12-16', 6, () => 10, 't', ['Talhão 1', 'Talhão 2', 'Talhão 3', 'Talhão 4'])
+    plantar(p.nome, 'item_parado', 'informativo', 'Sobra da safra passada: 80 t (R$ 19.200) sem retirada desde 16/12/2025')
   }
 
   // variacao_preco — última compra > 20% acima da média das anteriores.
@@ -546,11 +648,12 @@ export function gerarBase(): BaseSimulada {
   }
 
   // possivel_duplicidade por erro de digitação.
-  // Como foi plantada: uma compra digitada como "Glifozato 480" (com z), mesmo número de "Glifosato 480".
+  // Como foi plantada: uma compra digitada como "Herbicida glifozato 480" (com z), mesmo número
+  // de "Herbicida glifosato 480".
   {
-    const p = produto('Glifozato 480', 'Defensivos e biológicos')
+    const p = produto('Herbicida glifozato 480', 'Defensivos e biológicos')
     p.compra('2026-10-14', 20, 'L', '28,00', 'Revenda Agrícola Alfa', 'GLI-2610', '2028-09-30')
-    plantar(p.nome, 'possivel_duplicidade', 'atencao', 'Erro de digitação de "Glifosato 480": uma letra diferente e o mesmo número (R8)')
+    plantar(p.nome, 'possivel_duplicidade', 'atencao', 'Erro de digitação de "Herbicida glifosato 480": uma letra diferente e o mesmo número (R8)')
   }
 
   // devolucao_embalagem (extra do Victor) — lote de defensivo esgotado.
@@ -590,8 +693,11 @@ export function gerarBase(): BaseSimulada {
       ),
     ].join('\n') + '\n'
 
-  const totalProdutos = new Set(linhas.map((l) => l.produto)).size
-  const base = { csv, situacoes, normais, secundarios, totalProdutos, totalMovimentacoes: linhas.length, categorias: [...categorias] }
+  const nomes = [...new Set(linhas.map((l) => l.produto))]
+  const extras = nomes.filter((n) => !ANEXO_III.some((x) => x.produto === n))
+  const base = {
+    csv, situacoes, normais, secundarios, extras, totalProdutos: nomes.length, totalMovimentacoes: linhas.length, categorias: [...categorias],
+  }
   return { ...base, situacoesMd: gerarSituacoesMd(base) }
 }
 
@@ -615,9 +721,19 @@ function gerarSituacoesMd(b: Omit<BaseSimulada, 'situacoesMd'>): string {
 - **Unidades misturadas de propósito (R1):** compras em t, sc 50 kg e L; retiradas em kg e mL.
 - **Dados ausentes de propósito (R2):** preço \`N/D\` em parte das compras de luva, preço \`-\` em todas
   as compras do conector, validade \`-\` ou vazia em fertilizantes, corretivos e peças.
-- **Padrões de lavoura:** compras grandes de safra (calcário, superfosfato, NPK), defensivos em doses
+- **Padrões de lavoura:** compras grandes de safra (calcário, MAP, NPK), defensivos em doses
   fracionadas (mL), sementes que entram e saem em poucas semanas, adubo de plantio (NPK 04-30-16 em
   fevereiro) seguido da cobertura ~25 dias depois (ureia e sulfato de amônio em março).
+
+## Catálogo × Anexo III
+
+Todos os exemplos do Anexo III estão na base; os genéricos ("Herbicidas", "Filtros") foram
+especificados. Produtos fora desta tabela existem só para manter situações plantadas
+(${b.extras.map((e) => `"${e}"`).join(', ')}).
+
+| Categoria | Exemplo do Anexo III | Produto na base |
+|---|---|---|
+${ANEXO_III.map((x) => `| ${x.categoria} | ${x.exemplo} | ${celula(x.produto)} |`).join('\n')}
 
 ## Situações plantadas
 

@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { CATEGORIAS } from '@tetrarreme/contrato'
 import { describe, expect, test } from 'vitest'
-import { DATA_REFERENCIA, INICIO, gerarBase } from '../../data/simulados/gerar.ts'
+import { ANEXO_III, DATA_REFERENCIA, INICIO, gerarBase } from '../../data/simulados/gerar.ts'
 import { analisar } from '../src/analise/analisar.ts'
 import { HOJE_SIMULADO, PASTA_SIMULADOS, carregarBaseSimulada } from './apoio.ts'
 
@@ -35,6 +35,17 @@ describe('Base simulada', () => {
     expect(datas.at(-1)! <= DATA_REFERENCIA).toBe(true)
     expect(datas.at(-1)! >= '2026-10-19').toBe(true)
     expect(resultado.data).toBe(DATA_REFERENCIA)
+  })
+
+  test('o catálogo cobre todos os exemplos do Anexo III; extras só para situações plantadas', () => {
+    const nomes = new Set(nomeDe.values())
+    for (const { categoria, exemplo, produto } of ANEXO_III) {
+      expect(nomes, `${exemplo} (${categoria})`).toContain(produto)
+      expect(base.produtosNovos.find((p) => p.nome_canonico === produto)!.categoria).toBe(categoria)
+    }
+    expect(new Set(ANEXO_III.map((x) => x.categoria))).toEqual(new Set(CATEGORIAS))
+    const plantados = new Set(situacoes.map((s) => s.produto))
+    for (const extra of gerada.extras) expect(plantados, extra).toContain(extra)
   })
 
   test('a base é identificada como simulada (R7)', () => {

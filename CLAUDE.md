@@ -78,6 +78,21 @@ movimentacao   (id UUID gerado no cliente, produto_id, nome_original, tipo [entr
 - Saldo e validade são acompanhados **por lote** (o risco de vencimento é por lote).
 - Categorias (Anexo III): Fertilizantes; Corretivos; Sementes; Defensivos e biológicos;
   Combustíveis e lubrificantes; Peças e manutenção; Materiais de irrigação; EPI e diversos.
+- Exemplos de produtos por categoria (Anexo III do edital):
+
+  | Categoria | Exemplos de produtos (Anexo III) |
+  |---|---|
+  | Fertilizantes | Ureia; KCl; MAP; NPK 04-14-08; NPK 10-10-10; NPK 04-30-16; sulfato de amônio; FTE BR-12 |
+  | Corretivos | Calcário dolomítico; gesso agrícola |
+  | Sementes | Milho; soja; feijão; braquiária |
+  | Defensivos e biológicos | Herbicidas; fungicidas; inseticidas; adjuvante; Trichoderma; Azospirillum; inoculante |
+  | Combustíveis e lubrificantes | Óleo diesel S10; óleo de motor; óleo hidráulico; graxa |
+  | Peças e manutenção | Filtros; correias; rolamentos; bicos de pulverização; mangueiras; parafusos; discos de corte; eletrodos |
+  | Materiais de irrigação | Tubos PVC; mangueira de gotejamento; conectores; filtros; registros |
+  | EPI e materiais diversos | Luvas; respiradores; filtros; óculos; aventais; botas; sacos; etiquetas; fitas; estacas |
+
+  No código e no contrato, a última categoria se chama `EPI e diversos`. "Filtros" aparece em três
+  categorias e são produtos distintos (nunca sugerir unificação entre eles).
 - O importador usa **mapeamento de colunas configurável**: o formato da base oficial ainda é desconhecido.
 
 ## 6. Alertas
