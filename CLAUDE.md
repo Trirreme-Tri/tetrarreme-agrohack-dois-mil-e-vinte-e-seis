@@ -169,6 +169,7 @@ Com confiança `insuficiente`, não exibir número de dias: dizer que não há h
 - **Reanálise:** inserir uma movimentação e verificar a mudança do alerta.
 - A base simulada fica em `data/simulados/`, com um arquivo `SITUACOES.md` listando cada situação
   plantada, o produto e o alerta esperado.
+  A base e o `SITUACOES.md` são gerados por `data/simulados/gerar.ts` (semente fixa, `npm run gerar:simulados`).
 
 ## 11. Fluxo de trabalho
 
