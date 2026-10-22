@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "react-dom": "^19.3.1",
+    "@tetrarreme/contrato": "*"
   },
   "devDependencies": {
     "@types/node": "^24.19.2",
