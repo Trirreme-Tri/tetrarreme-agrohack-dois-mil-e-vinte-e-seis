@@ -470,18 +470,26 @@ export function gerarBase(): BaseSimulada {
     normal(p.nome, 'Uso semanal na horta e no pomar (fora da lavoura), com recompra em sacos de 50 kg')
   }
   {
+    // COMPRA ANUAL NORMAL (insumo sazonal): a safra passada usou tudo; a compra deste ano (12 t em
+    // agosto) começa a sair no plantio da soja. O saldo dá para ~200 dias de consumo: o padrão geral
+    // (excesso > 180 dias) acusaria falso excesso; o limite sazonal de Fertilizantes (> 365 dias) não.
     const p = produto('MAP (fosfato monoamônico)', 'Fertilizantes')
     p.compra('2025-11-20', 60, 'sc 50 kg', '210,00', 'Cooperativa Beta', 'MAP-2511')
     p.retiradas('2025-11-25', '2025-12-13', 2, () => 300, 'kg', ['Talhão 3', 'Talhão 4'])
-    normal(p.nome, 'Adubo de plantio da soja de 2025; usado todo (saldo zero)')
+    p.compra('2026-08-25', 12, 't', '4200,00', 'Cooperativa Beta', 'MAP-2608')
+    p.retiradas('2026-09-25', '2026-10-19', 3, () => 300, 'kg', ['Talhão 3', 'Talhão 4'])
+    normal(p.nome, 'Compra anual normal (12 t em agosto) para o plantio da soja: saldo para ~200 dias é o esperado para insumo de safra (limite sazonal de Fertilizantes)')
   }
 
   // ---- Corretivos (Anexo III: calcário dolomítico; gesso agrícola). O calcário é situação plantada.
   {
+    // COMPRA ANUAL NORMAL (insumo sazonal): 60 t em junho; 16 t aplicadas em junho e o restante
+    // programado para depois do plantio. Fica ~110 dias sem retirada: o padrão geral (item parado
+    // > 60 dias) acusaria falso item parado; o limite sazonal de Corretivos (> 180 dias) não.
     const p = produto('Gesso agrícola', 'Corretivos')
-    p.compra('2026-06-10', 20, 't', '190,00', 'Revenda Agrícola Alfa')
-    p.retiradas('2026-06-20', '2026-07-18', 7, () => 4, 't', ['Talhão 1', 'Talhão 2', 'Talhão 3', 'Talhão 4', 'Talhão 5'])
-    normal(p.nome, 'Comprado e aplicado todo no inverno (saldo zero)')
+    p.compra('2026-06-10', 60, 't', '190,00', 'Revenda Agrícola Alfa')
+    p.retiradas('2026-06-10', '2026-07-01', 7, () => 4, 't', ['Talhão 1', 'Talhão 2', 'Talhão 3', 'Talhão 4'])
+    normal(p.nome, 'Compra anual normal (60 t em junho), aplicação parcial e o restante programado para depois do plantio: ~110 dias sem retirada é o esperado (limite sazonal de Corretivos)')
   }
 
   // ---- Sementes (Anexo III: milho; soja; feijão; braquiária): entram e saem em poucas semanas.

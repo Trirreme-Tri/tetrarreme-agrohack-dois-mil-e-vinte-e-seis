@@ -1372,8 +1372,9 @@ SIMULADO;Bico de pulverização leque 110-02;Peças e manutenção;un;2;4;saída
 SIMULADO;Parafuso sextavado M12;Peças e manutenção;un;11;20;saída;09/06/2026;;;;;Oficina;Funcionário B
 SIMULADO;Disco de corte para esmerilhadeira;Peças e manutenção;un;2;4;saída;09/06/2026;;;;;Oficina;Funcionário A
 SIMULADO;NPK 10-10-10;Fertilizantes;kg;41;100;saída;09/06/2026;;;;;Horta e pomar;Funcionário D
-SIMULADO;Gesso agrícola;Corretivos;t;20;;entrada;10/06/2026;190,00;;-;Revenda Agrícola Alfa;;Funcionário A
+SIMULADO;Gesso agrícola;Corretivos;t;60;;entrada;10/06/2026;190,00;;-;Revenda Agrícola Alfa;;Funcionário A
 SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;10/06/2026;;;;;Pulverização;Funcionário B
+SIMULADO;Gesso agrícola;Corretivos;t;4;;saída;10/06/2026;;;;;Talhão 1;Funcionário B
 SIMULADO;Fungicida azoxistrobina;Defensivos e biológicos;mL;2000;;saída;10/06/2026;;;;;Pulverizador;Funcionário A
 SIMULADO;Óleo diesel S10;Combustíveis e lubrificantes;L;105;500;saída;12/06/2026;;;;;Trator 1;Funcionário D
 SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;12/06/2026;;;;;Pulverização;Funcionário C
@@ -1401,6 +1402,7 @@ SIMULADO;Bico de pulverização leque 110-02;Peças e manutenção;un;2;4;saída
 SIMULADO;Parafuso sextavado M12;Peças e manutenção;un;10;20;saída;16/06/2026;;;;;Oficina;Funcionário B
 SIMULADO;Disco de corte para esmerilhadeira;Peças e manutenção;un;2;4;saída;16/06/2026;;;;;Oficina;Funcionário B
 SIMULADO;NPK 10-10-10;Fertilizantes;kg;56;100;saída;16/06/2026;;;;;Horta e pomar;Funcionário D
+SIMULADO;Gesso agrícola;Corretivos;t;4;;saída;17/06/2026;;;;;Talhão 2;Funcionário B
 SIMULADO;Óleo diesel S10;Combustíveis e lubrificantes;L;110;500;saída;18/06/2026;;;;;Gerador;Funcionário B
 SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;18/06/2026;;;;;Pulverização;Funcionário D
 SIMULADO;Respirador PFF2;EPI e diversos;un;2;10;saída;18/06/2026;;;;;Pulverização;Funcionário B
@@ -1421,7 +1423,6 @@ SIMULADO;Mangueira hidráulica 1/2 pol;Peças e manutenção;un;1;2;saída;18/06
 SIMULADO;Eletrodo de solda 2,5 mm;Peças e manutenção;kg;1,1;2;saída;18/06/2026;;;;;Oficina;Funcionário B
 SIMULADO;Inseticida lambda-cialotrina;Defensivos e biológicos;mL;226;;saída;19/06/2026;;;;;Pulverizador;Funcionário D
 SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;20/06/2026;;;;;Pulverização;Funcionário D
-SIMULADO;Gesso agrícola;Corretivos;t;4;;saída;20/06/2026;;;;;Talhão 1;Funcionário B
 SIMULADO;Fungicida azoxistrobina;Defensivos e biológicos;mL;2000;;saída;20/06/2026;;;;;Pulverizador;Funcionário A
 SIMULADO;Óleo diesel S10;Combustíveis e lubrificantes;L;119;500;saída;21/06/2026;;;;;Trator 1;Funcionário B
 SIMULADO;Respirador PFF2;EPI e diversos;un;2;10;saída;21/06/2026;;;;;Pulverização;Funcionário B
@@ -1448,13 +1449,13 @@ SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;24/06/2026;;;;;Pulveriza�
 SIMULADO;Respirador PFF2;EPI e diversos;un;2;10;saída;24/06/2026;;;;;Pulverização;Funcionário A
 SIMULADO;Saco de ráfia 60 kg;EPI e diversos;un;5;20;saída;24/06/2026;;;;;Galpão;Funcionário B
 SIMULADO;Etiqueta de identificação;EPI e diversos;un;18;50;saída;24/06/2026;;;;;Galpão;Funcionário D
+SIMULADO;Gesso agrícola;Corretivos;t;4;;saída;24/06/2026;;;;;Talhão 3;Funcionário B
 SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;26/06/2026;;;;;Pulverização;Funcionário B
 SIMULADO;Inseticida lambda-cialotrina;Defensivos e biológicos;mL;278;;saída;26/06/2026;;;;;Pulverizador;Funcionário C
 SIMULADO;Óleo diesel S10;Combustíveis e lubrificantes;L;106;500;saída;27/06/2026;;;;;Gerador;Funcionário D
 SIMULADO;Respirador PFF2;EPI e diversos;un;2;10;saída;27/06/2026;;;;;Pulverização;Funcionário A
 SIMULADO;Saco de ráfia 60 kg;EPI e diversos;un;5;20;saída;27/06/2026;;;;;Galpão;Funcionário C
 SIMULADO;Etiqueta de identificação;EPI e diversos;un;18;50;saída;27/06/2026;;;;;Galpão;Funcionário B
-SIMULADO;Gesso agrícola;Corretivos;t;4;;saída;27/06/2026;;;;;Talhão 2;Funcionário B
 SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;28/06/2026;;;;;Pulverização;Funcionário B
 SIMULADO;Óculos de proteção;EPI e diversos;un;1;2;saída;28/06/2026;;;;;Pulverização;Funcionário C
 SIMULADO;Avental impermeável;EPI e diversos;un;1;2;saída;28/06/2026;;;;;Preparo de calda;Funcionário C
@@ -1486,6 +1487,7 @@ SIMULADO;Disco de corte para esmerilhadeira;Peças e manutenção;un;2;4;saída;
 SIMULADO;NPK 10-10-10;Fertilizantes;kg;59;100;saída;30/06/2026;;;;;Horta e pomar;Funcionário D
 SIMULADO;Fungicida azoxistrobina;Defensivos e biológicos;mL;2000;;saída;30/06/2026;;;;;Pulverizador;Funcionário D
 SIMULADO;Herbicida glifosato 480;Defensivos e biológicos;L;387;20;entrada;01/07/2026;28,00;GLI-2607;30/06/2028;Revenda Agrícola Alfa;;Funcionário D
+SIMULADO;Gesso agrícola;Corretivos;t;4;;saída;01/07/2026;;;;;Talhão 4;Funcionário D
 SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;02/07/2026;;;;;Pulverização;Funcionário B
 SIMULADO;Óleo diesel S10;Combustíveis e lubrificantes;L;91;500;saída;03/07/2026;;;;;Trator 2;Funcionário A
 SIMULADO;Respirador PFF2;EPI e diversos;un;2;10;saída;03/07/2026;;;;;Pulverização;Funcionário A
@@ -1497,7 +1499,6 @@ SIMULADO;Trichoderma harzianum;Defensivos e biológicos;kg;1,1;;saída;03/07/202
 SIMULADO;Azospirillum brasilense;Defensivos e biológicos;mL;407;;saída;03/07/2026;;;;;Tratamento de sementes;Funcionário B
 SIMULADO;Inseticida lambda-cialotrina;Defensivos e biológicos;mL;222;;saída;03/07/2026;;;;;Pulverizador;Funcionário C
 SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;04/07/2026;;;;;Pulverização;Funcionário A
-SIMULADO;Gesso agrícola;Corretivos;t;4;;saída;04/07/2026;;;;;Talhão 3;Funcionário B
 SIMULADO;Fungicida mancozebe;Defensivos e biológicos;kg;3;;saída;05/07/2026;;;;;Pulverizador;Funcionário A
 SIMULADO;Adjuvante óleo mineral;Defensivos e biológicos;L;1,8;;saída;05/07/2026;;;;;Pulverizador;Funcionário C
 SIMULADO;Herbicida glifosato 480;Defensivos e biológicos;L;13;20;saída;05/07/2026;;;;;Pulverizador;Funcionário A
@@ -1537,7 +1538,6 @@ SIMULADO;Herbicida glifosato 480;Defensivos e biológicos;L;11;20;saída;09/07/2
 SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;10/07/2026;;;;;Pulverização;Funcionário A
 SIMULADO;Fungicida azoxistrobina;Defensivos e biológicos;mL;2000;;saída;10/07/2026;;;;;Pulverizador;Funcionário B
 SIMULADO;Inseticida lambda-cialotrina;Defensivos e biológicos;mL;227;;saída;10/07/2026;;;;;Pulverizador;Funcionário A
-SIMULADO;Gesso agrícola;Corretivos;t;4;;saída;11/07/2026;;;;;Talhão 4;Funcionário D
 SIMULADO;Óleo diesel S10;Combustíveis e lubrificantes;L;83;500;saída;12/07/2026;;;;;Trator 2;Funcionário B
 SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;12/07/2026;;;;;Pulverização;Funcionário B
 SIMULADO;Respirador PFF2;EPI e diversos;un;2;10;saída;12/07/2026;;;;;Pulverização;Funcionário A
@@ -1585,7 +1585,6 @@ SIMULADO;Correia do alternador;Peças e manutenção;un;1;2;saída;18/07/2026;;;
 SIMULADO;Rolamento 6205;Peças e manutenção;un;1;2;saída;18/07/2026;;;;;Grade;Funcionário A
 SIMULADO;Mangueira hidráulica 1/2 pol;Peças e manutenção;un;1;2;saída;18/07/2026;;;;;Trator 2;Funcionário D
 SIMULADO;Eletrodo de solda 2,5 mm;Peças e manutenção;kg;0,9;2;saída;18/07/2026;;;;;Oficina;Funcionário C
-SIMULADO;Gesso agrícola;Corretivos;t;4;;saída;18/07/2026;;;;;Talhão 5;Funcionário D
 SIMULADO;Fungicida mancozebe;Defensivos e biológicos;kg;3,4;;saída;19/07/2026;;;;;Pulverizador;Funcionário C
 SIMULADO;Adjuvante óleo mineral;Defensivos e biológicos;L;2,1;;saída;19/07/2026;;;;;Pulverizador;Funcionário A
 SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;20/07/2026;;;;;Pulverização;Funcionário C
@@ -1807,6 +1806,7 @@ SIMULADO;Fungicida mancozebe;Defensivos e biológicos;kg;2,8;;saída;23/08/2026;
 SIMULADO;Adjuvante óleo mineral;Defensivos e biológicos;L;1,9;;saída;23/08/2026;;;;;Pulverizador;Funcionário B
 SIMULADO;Cloreto de potássio (KCl);Fertilizantes;kg;92;1000;saída;23/08/2026;;;;;Talhão 3;Funcionário C
 SIMULADO;Graxa para rolamentos;Combustíveis e lubrificantes;kg;1,1;5;saída;24/08/2026;;;;;Plantadeira;Funcionário C
+SIMULADO;MAP (fosfato monoamônico);Fertilizantes;t;12;;entrada;25/08/2026;4200,00;MAP-2608;-;Cooperativa Beta;;Funcionário B
 SIMULADO;Óleo de motor 15W40;Combustíveis e lubrificantes;L;3,2;20;saída;25/08/2026;;;;;Oficina;Funcionário D
 SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;25/08/2026;;;;;Pulverização;Funcionário B
 SIMULADO;Filtro para respirador;EPI e diversos;un;2;4;saída;25/08/2026;;;;;Pulverização;Funcionário D
@@ -2033,6 +2033,7 @@ SIMULADO;Óleo diesel S10;Combustíveis e lubrificantes;L;107;500;saída;25/09/2
 SIMULADO;Respirador PFF2;EPI e diversos;un;2;10;saída;25/09/2026;;;;;Pulverização;Funcionário D
 SIMULADO;Saco de ráfia 60 kg;EPI e diversos;un;5;20;saída;25/09/2026;;;;;Galpão;Funcionário C
 SIMULADO;Etiqueta de identificação;EPI e diversos;un;24;50;saída;25/09/2026;;;;;Galpão;Funcionário B
+SIMULADO;MAP (fosfato monoamônico);Fertilizantes;kg;300;;saída;25/09/2026;;;;;Talhão 3;Funcionário C
 SIMULADO;Graxa para rolamentos;Combustíveis e lubrificantes;kg;1,1;5;saída;25/09/2026;;;;;Trator 1;Funcionário A
 SIMULADO;Inseticida lambda-cialotrina;Defensivos e biológicos;mL;240;;saída;25/09/2026;;;;;Pulverizador;Funcionário D
 SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;26/09/2026;;;;;Pulverização;Funcionário B
@@ -2059,6 +2060,7 @@ SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;28/09/2026;;;;;Pulveriza�
 SIMULADO;Respirador PFF2;EPI e diversos;un;2;10;saída;28/09/2026;;;;;Pulverização;Funcionário A
 SIMULADO;Saco de ráfia 60 kg;EPI e diversos;un;6;20;saída;28/09/2026;;;;;Galpão;Funcionário B
 SIMULADO;Etiqueta de identificação;EPI e diversos;un;22;50;saída;28/09/2026;;;;;Galpão;Funcionário C
+SIMULADO;MAP (fosfato monoamônico);Fertilizantes;kg;300;;saída;28/09/2026;;;;;Talhão 4;Funcionário D
 SIMULADO;Cloreto de potássio (KCl);Fertilizantes;kg;100;1000;saída;28/09/2026;;;;;Talhão 3;Funcionário C
 SIMULADO;Fungicida azoxistrobina;Defensivos e biológicos;mL;2000;;saída;28/09/2026;;;;;Pulverizador;Funcionário A
 SIMULADO;Graxa para rolamentos;Combustíveis e lubrificantes;kg;1,1;5;saída;28/09/2026;;;;;Plantadeira;Funcionário D
@@ -2081,6 +2083,7 @@ SIMULADO;Estaca de madeira;EPI e diversos;un;11;20;saída;01/10/2026;;;;;Cercas 
 SIMULADO;Inseticida biológico Bacillus thuringiensis;Defensivos e biológicos;mL;769;;saída;01/10/2026;;;;;Pulverizador;Funcionário D
 SIMULADO;Trichoderma harzianum;Defensivos e biológicos;kg;1,2;;saída;01/10/2026;;;;;Talhão 3;Funcionário C
 SIMULADO;Azospirillum brasilense;Defensivos e biológicos;mL;510;;saída;01/10/2026;;;;;Tratamento de sementes;Funcionário A
+SIMULADO;MAP (fosfato monoamônico);Fertilizantes;kg;300;;saída;01/10/2026;;;;;Talhão 3;Funcionário C
 SIMULADO;Herbicida glifosato 480;Defensivos e biológicos;L;12;20;saída;01/10/2026;;;;;Pulverizador;Funcionário D
 SIMULADO;Graxa para rolamentos;Combustíveis e lubrificantes;kg;1;5;saída;01/10/2026;;;;;Trator 1;Funcionário B
 SIMULADO;NPK 04-14-08;Fertilizantes;sc 50 kg;80;;entrada;02/10/2026;205,00;NPK0414-2610;-;Revenda Agrícola Alfa;;Funcionário C
@@ -2095,6 +2098,7 @@ SIMULADO;Saco de ráfia 60 kg;EPI e diversos;un;6;20;saída;04/10/2026;;;;;Galp�
 SIMULADO;Etiqueta de identificação;EPI e diversos;un;21;50;saída;04/10/2026;;;;;Galpão;Funcionário C
 SIMULADO;Fungicida mancozebe;Defensivos e biológicos;kg;3,5;;saída;04/10/2026;;;;;Pulverizador;Funcionário C
 SIMULADO;Adjuvante óleo mineral;Defensivos e biológicos;L;1,9;;saída;04/10/2026;;;;;Pulverizador;Funcionário B
+SIMULADO;MAP (fosfato monoamônico);Fertilizantes;kg;300;;saída;04/10/2026;;;;;Talhão 4;Funcionário B
 SIMULADO;Cloreto de potássio (KCl);Fertilizantes;kg;92;1000;saída;04/10/2026;;;;;Talhão 3;Funcionário C
 SIMULADO;Graxa para rolamentos;Combustíveis e lubrificantes;kg;1,1;5;saída;04/10/2026;;;;;Plantadeira;Funcionário C
 SIMULADO;Óleo hidráulico;Combustíveis e lubrificantes;L;9;;saída;04/10/2026;;;;;Trator 1;Funcionário D
@@ -2126,6 +2130,7 @@ SIMULADO;Óleo diesel S10;Combustíveis e lubrificantes;L;85;500;saída;07/10/20
 SIMULADO;Respirador PFF2;EPI e diversos;un;2;10;saída;07/10/2026;;;;;Pulverização;Funcionário C
 SIMULADO;Saco de ráfia 60 kg;EPI e diversos;un;6;20;saída;07/10/2026;;;;;Galpão;Funcionário C
 SIMULADO;Etiqueta de identificação;EPI e diversos;un;23;50;saída;07/10/2026;;;;;Galpão;Funcionário B
+SIMULADO;MAP (fosfato monoamônico);Fertilizantes;kg;300;;saída;07/10/2026;;;;;Talhão 3;Funcionário B
 SIMULADO;Graxa para rolamentos;Combustíveis e lubrificantes;kg;1;5;saída;07/10/2026;;;;;Trator 1;Funcionário A
 SIMULADO;NPK 04-14-08;Fertilizantes;kg;191;;saída;07/10/2026;;;;;Talhão 4;Funcionário B
 SIMULADO;Semente de soja;Sementes;kg;2400;;entrada;08/10/2026;9,00;SOJ-2610;30/04/2027;Cooperativa Beta;;Funcionário C
@@ -2141,6 +2146,7 @@ SIMULADO;Luva nitrílica;EPI e diversos;un;2;20;saída;10/10/2026;;;;;Pulveriza�
 SIMULADO;Respirador PFF2;EPI e diversos;un;2;10;saída;10/10/2026;;;;;Pulverização;Funcionário A
 SIMULADO;Saco de ráfia 60 kg;EPI e diversos;un;5;20;saída;10/10/2026;;;;;Galpão;Funcionário C
 SIMULADO;Etiqueta de identificação;EPI e diversos;un;22;50;saída;10/10/2026;;;;;Galpão;Funcionário C
+SIMULADO;MAP (fosfato monoamônico);Fertilizantes;kg;300;;saída;10/10/2026;;;;;Talhão 4;Funcionário A
 SIMULADO;Cloreto de potássio (KCl);Fertilizantes;kg;96;1000;saída;10/10/2026;;;;;Talhão 3;Funcionário D
 SIMULADO;Graxa para rolamentos;Combustíveis e lubrificantes;kg;1;5;saída;10/10/2026;;;;;Plantadeira;Funcionário B
 SIMULADO;Herbicida 2,4-D;Defensivos e biológicos;L;2;;saída;10/10/2026;;;;;Pulverizador;Funcionário C
@@ -2165,6 +2171,7 @@ SIMULADO;Bico de pulverização leque 110-02;Peças e manutenção;un;2;4;saída
 SIMULADO;Parafuso sextavado M12;Peças e manutenção;un;8;20;saída;13/10/2026;;;;;Oficina;Funcionário D
 SIMULADO;Disco de corte para esmerilhadeira;Peças e manutenção;un;2;4;saída;13/10/2026;;;;;Oficina;Funcionário B
 SIMULADO;NPK 10-10-10;Fertilizantes;kg;50;100;saída;13/10/2026;;;;;Horta e pomar;Funcionário C
+SIMULADO;MAP (fosfato monoamônico);Fertilizantes;kg;300;;saída;13/10/2026;;;;;Talhão 3;Funcionário B
 SIMULADO;Herbicida glifosato 480;Defensivos e biológicos;L;13;20;saída;13/10/2026;;;;;Pulverizador;Funcionário A
 SIMULADO;Graxa para rolamentos;Combustíveis e lubrificantes;kg;0,9;5;saída;13/10/2026;;;;;Trator 1;Funcionário D
 SIMULADO;NPK 04-14-08;Fertilizantes;kg;206;;saída;13/10/2026;;;;;Talhão 3;Funcionário B
@@ -2192,6 +2199,7 @@ SIMULADO;Correia do alternador;Peças e manutenção;un;1;2;saída;16/10/2026;;;
 SIMULADO;Rolamento 6205;Peças e manutenção;un;1;2;saída;16/10/2026;;;;;Plantadeira;Funcionário C
 SIMULADO;Mangueira hidráulica 1/2 pol;Peças e manutenção;un;1;2;saída;16/10/2026;;;;;Trator 1;Funcionário B
 SIMULADO;Eletrodo de solda 2,5 mm;Peças e manutenção;kg;1;2;saída;16/10/2026;;;;;Oficina;Funcionário A
+SIMULADO;MAP (fosfato monoamônico);Fertilizantes;kg;300;;saída;16/10/2026;;;;;Talhão 4;Funcionário C
 SIMULADO;Cloreto de potássio (KCl);Fertilizantes;kg;101;1000;saída;16/10/2026;;;;;Talhão 3;Funcionário D
 SIMULADO;Graxa para rolamentos;Combustíveis e lubrificantes;kg;1;5;saída;16/10/2026;;;;;Plantadeira;Funcionário B
 SIMULADO;Inseticida lambda-cialotrina;Defensivos e biológicos;mL;279;;saída;16/10/2026;;;;;Pulverizador;Funcionário B
@@ -2208,6 +2216,7 @@ SIMULADO;Óleo diesel S10;Combustíveis e lubrificantes;L;116;500;saída;19/10/2
 SIMULADO;Respirador PFF2;EPI e diversos;un;2;10;saída;19/10/2026;;;;;Pulverização;Funcionário A
 SIMULADO;Saco de ráfia 60 kg;EPI e diversos;un;5;20;saída;19/10/2026;;;;;Galpão;Funcionário C
 SIMULADO;Etiqueta de identificação;EPI e diversos;un;21;50;saída;19/10/2026;;;;;Galpão;Funcionário C
+SIMULADO;MAP (fosfato monoamônico);Fertilizantes;kg;300;;saída;19/10/2026;;;;;Talhão 3;Funcionário D
 SIMULADO;Graxa para rolamentos;Combustíveis e lubrificantes;kg;1;5;saída;19/10/2026;;;;;Trator 1;Funcionário B
 SIMULADO;Óleo hidráulico;Combustíveis e lubrificantes;L;10;;saída;19/10/2026;;;;;Trator 2;Funcionário B
 SIMULADO;NPK 04-14-08;Fertilizantes;kg;207;;saída;19/10/2026;;;;;Talhão 4;Funcionário A

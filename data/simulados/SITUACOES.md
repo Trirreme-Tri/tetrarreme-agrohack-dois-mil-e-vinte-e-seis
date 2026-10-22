@@ -12,7 +12,7 @@
 - **Gerador:** `data/simulados/gerar.ts` — determinístico (semente fixa); `npm run gerar:simulados` na raiz.
 - **Data de referência da análise:** 20/10/2026.
 - **Período:** 21/10/2025 a 20/10/2026 (12 meses).
-- **Volume:** 2220 movimentações, 53 produtos, 8 categorias do Anexo III.
+- **Volume:** 2229 movimentações, 53 produtos, 8 categorias do Anexo III.
 - **Unidades misturadas de propósito (R1):** compras em t, sc 50 kg e L; retiradas em kg e mL.
 - **Dados ausentes de propósito (R2):** preço `N/D` em parte das compras de luva, preço `-` em todas
   as compras do conector, validade `-` ou vazia em fertilizantes, corretivos e peças.
@@ -148,8 +148,8 @@ Os testes de falsos positivos exigem que nenhum destes 40 produtos gere alerta.
 | Ureia | Adubo de cobertura do milho (~25 dias após o plantio); sobra pequena. O alerta de duplicidade fica no produto cadastrado depois ("UREIA 45%") |
 | Sulfato de amônio | Cobertura do milho em março; usado todo (saldo zero) |
 | NPK 10-10-10 | Uso semanal na horta e no pomar (fora da lavoura), com recompra em sacos de 50 kg |
-| MAP (fosfato monoamônico) | Adubo de plantio da soja de 2025; usado todo (saldo zero) |
-| Gesso agrícola | Comprado e aplicado todo no inverno (saldo zero) |
+| MAP (fosfato monoamônico) | Compra anual normal (12 t em agosto) para o plantio da soja: saldo para ~200 dias é o esperado para insumo de safra (limite sazonal de Fertilizantes) |
+| Gesso agrícola | Compra anual normal (60 t em junho), aplicação parcial e o restante programado para depois do plantio: ~110 dias sem retirada é o esperado (limite sazonal de Corretivos) |
 | Semente de milho híbrido | Entrou em janeiro e saiu toda no plantio de fevereiro (saldo zero) |
 | Semente de feijão | Plantio de maio; saiu toda (saldo zero) |
 | Semente de braquiária | Planta de cobertura (palhada para plantio direto), semeada em agosto; saiu toda (saldo zero) |

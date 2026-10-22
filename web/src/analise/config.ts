@@ -119,11 +119,18 @@ export const CONFIG_PADRAO: ConfigAnalise = {
     diasReposicao: 30,
   },
 
-  // A preencher com o Victor. Exemplo (adubo usado uma vez por safra não é "item parado" em 60 dias):
-  //   Fertilizantes: { itemParado: { diasSemSaida: 240 } },
+  // A preencher com o Victor.
   porCategoria: {
-    'Fertilizantes': {},
-    'Corretivos': {},
+    // Insumos sazonais: comprados uma vez por ano, em grande volume, e consumidos ao longo da safra.
+    // Com o padrão geral, logo após a compra anual eles acusariam excesso e item parado sem motivo.
+    'Fertilizantes': {
+      excesso: { coberturaMinimaDias: 365 }, // PROVISÓRIO — calibrar com o Victor
+      itemParado: { diasSemSaida: 180 }, // PROVISÓRIO — calibrar com o Victor
+    },
+    'Corretivos': {
+      excesso: { coberturaMinimaDias: 365 }, // PROVISÓRIO — calibrar com o Victor
+      itemParado: { diasSemSaida: 180 }, // PROVISÓRIO — calibrar com o Victor
+    },
     'Sementes': {},
     'Defensivos e biológicos': {},
     'Combustíveis e lubrificantes': {},

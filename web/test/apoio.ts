@@ -55,7 +55,8 @@ export function carregarBaseSimulada(): ResultadoImportacao {
 export function produto(parcial: Partial<Produto> & { id: string }): Produto {
   return {
     nome_canonico: parcial.id,
-    categoria: 'Fertilizantes',
+    // Categoria sem ajuste em porCategoria: os testes sintéticos usam o padrão geral.
+    categoria: 'Peças e manutenção',
     unidade_base_id: 'kg',
     estoque_minimo: null,
     ...parcial,

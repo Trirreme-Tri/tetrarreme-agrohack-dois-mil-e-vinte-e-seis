@@ -15,11 +15,19 @@ function comAjustes(ajustes: Pick<ConfigAnalise, 'porCategoria' | 'porProduto'>)
 }
 
 describe('Configuração em três níveis', () => {
-  test('começa só com o padrão geral: as 8 categorias estão prontas e vazias, sem ajuste por produto', () => {
+  test('as 8 categorias estão prontas; só Fertilizantes e Corretivos têm ajuste (sazonal); nenhum ajuste por produto', () => {
     expect(Object.keys(CONFIG_PADRAO.porCategoria).sort()).toEqual([...CATEGORIAS].sort())
-    for (const ajuste of Object.values(CONFIG_PADRAO.porCategoria)) expect(ajuste).toEqual({})
+    const sazonais = ['Fertilizantes', 'Corretivos'] as const
+    for (const c of CATEGORIAS) {
+      const ajuste = CONFIG_PADRAO.porCategoria[c]
+      if ((sazonais as readonly string[]).includes(c)) {
+        expect(ajuste).toEqual({ excesso: { coberturaMinimaDias: 365 }, itemParado: { diasSemSaida: 180 } })
+      } else {
+        expect(ajuste).toEqual({})
+        expect(limitesPara({ nome_canonico: 'x', categoria: c }).valores).toEqual(CONFIG_PADRAO.padrao)
+      }
+    }
     expect(CONFIG_PADRAO.porProduto).toEqual({})
-    for (const c of CATEGORIAS) expect(limitesPara({ nome_canonico: 'x', categoria: c }).valores).toEqual(CONFIG_PADRAO.padrao)
   })
 
   test('a categoria sobrepõe o padrão só no que define, mantendo os demais campos do grupo', () => {
@@ -148,7 +156,7 @@ describe('Chaves órfãs em porProduto', () => {
 
   test('chave que não corresponde a nenhum produto gera aviso de configuração, não alerta de estoque', () => {
     const config = comAjustes({
-      porCategoria: {},
+      porCategoria: CONFIG_PADRAO.porCategoria,
       porProduto: {
         'herbicida GLIFOSATO 480': { rupturaPrevista: { coberturaMaximaDias: 15 } }, // corresponde (normalizado)
         'Glifosato 480 Atar': { excesso: { coberturaMinimaDias: 90 } }, // não existe
@@ -162,5 +170,35 @@ describe('Chaves órfãs em porProduto', () => {
     // O aviso não entra na lista de alertas de estoque.
     expect(r.alertas.length).toBe(padrao.alertas.length - 1) // só some a ruptura do glifosato (ajuste válido)
     expect(r.alertas.some((a) => a.mensagem.includes('Atar'))).toBe(false)
+  })
+})
+
+describe('Insumos sazonais (Fertilizantes e Corretivos)', () => {
+  const base = carregarBaseSimulada()
+  const nomeDe = new Map(base.produtosNovos.map((p) => [p.id, p.nome_canonico]))
+  const alertasCom = (config: ConfigAnalise) =>
+    analisar(base.movimentacoes, base.produtosNovos, HOJE_SIMULADO, { config }).alertas.map((a) => `${nomeDe.get(a.produtoId)} | ${a.tipo}`)
+  const semAjusteSazonal = comAjustes({ porCategoria: {}, porProduto: {} })
+
+  test('as compras anuais normais não disparam excesso nem item parado', () => {
+    const alertas = alertasCom(CONFIG_PADRAO)
+    for (const produto of ['MAP (fosfato monoamônico)', 'Gesso agrícola']) {
+      expect(alertas.filter((a) => a.startsWith(`${produto} |`))).toEqual([])
+    }
+  })
+
+  test('sem o ajuste sazonal, essas mesmas compras virariam falsos alarmes', () => {
+    const alertas = alertasCom(semAjusteSazonal)
+    expect(alertas).toContain('MAP (fosfato monoamônico) | excesso')
+    expect(alertas).toContain('Gesso agrícola | item_parado')
+  })
+
+  test('continuam disparando: excesso em categoria não sazonal e item parado acima do ciclo da safra', () => {
+    const r = analisar(base.movimentacoes, base.produtosNovos, HOJE_SIMULADO)
+    const de = (produto: string, tipo: string) => r.alertas.find((a) => nomeDe.get(a.produtoId) === produto && a.tipo === tipo)
+    expect(de('Óleo hidráulico', 'excesso')!.evidencia.origemLimite).toBe('limite do padrão geral')
+    const parado = de('Calcário dolomítico', 'item_parado')!
+    expect(parado.evidencia.origemLimite).toBe('limite da categoria Corretivos')
+    expect(parado.evidencia.diasSemSaida).toBeGreaterThan(180)
   })
 })
