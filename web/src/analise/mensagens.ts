@@ -1,7 +1,7 @@
 // R4: a mensagem do alerta é gerada a partir dos campos estruturados.
 import { dataBr } from './datas.ts'
 import { fmtNum, fmtReais } from './formatacao.ts'
-import type { Alerta } from './tipos.ts'
+import type { Alerta } from '@tetrarreme/contrato'
 
 export type AlertaSemMensagem = Omit<Alerta, 'mensagem'>
 

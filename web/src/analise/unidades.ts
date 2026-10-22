@@ -1,5 +1,5 @@
 // R1: unidades diferentes nunca são somadas sem conversão.
-import type { Dimensao, Unidade } from './tipos.ts'
+import type { Dimensao, Unidade } from '@tetrarreme/contrato'
 
 export const UNIDADES: readonly Unidade[] = [
   { id: 'g', sigla: 'g', dimensao: 'massa', fator_para_base: 0.001 },

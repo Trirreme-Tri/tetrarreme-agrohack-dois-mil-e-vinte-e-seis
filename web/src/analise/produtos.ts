@@ -1,6 +1,6 @@
 // R8: produto canônico + apelidos. A unificação é sugerida, nunca automática,
 // e nunca acontece quando os números do nome diferem (NPK 04-14-08 ≠ NPK 04-30-16).
-import type { Produto, ProdutoAlias } from './tipos.ts'
+import type { Produto, ProdutoAlias } from '@tetrarreme/contrato'
 
 const PALAVRAS_IGNORADAS = new Set(['de', 'da', 'do', 'das', 'dos', 'para', 'com', 'e', 'em'])
 

@@ -17,7 +17,8 @@ import {
   sugerirDuplicidades,
   sugerirProdutos,
 } from '../src/analise/produtos.ts'
-import type { Alerta, Movimentacao } from '../src/analise/tipos.ts'
+import { AlertaSchema, MovimentacaoSchema, ProdutoSchema, descreverErros } from '@tetrarreme/contrato'
+import type { Alerta, Movimentacao } from '@tetrarreme/contrato'
 import { ErroDimensao, converter, somar } from '../src/analise/unidades.ts'
 import {
   HOJE_SIMULADO,
@@ -359,5 +360,49 @@ describe('R8 — produtos com nomes diferentes', () => {
     expect(duplicidades).toHaveLength(1)
     expect(nomeDe(duplicidades[0].produtoId)).toBe('UREIA 45%')
     expect(duplicidades[0].evidencia.outroProduto).toBe('Ureia')
+  })
+})
+
+describe('Contrato de dados (@tetrarreme/contrato)', () => {
+  test('R4: todo alerta da base simulada é válido no schema de Alerta', () => {
+    for (const a of resultadoBase.alertas) {
+      const r = AlertaSchema.safeParse(a)
+      expect(r.success, r.success ? '' : `${a.tipo}: ${descreverErros(r.error)}`).toBe(true)
+    }
+  })
+
+  test('toda movimentação e todo produto importados da base simulada são válidos no contrato', () => {
+    for (const m of base.movimentacoes) expect(MovimentacaoSchema.safeParse(m).success).toBe(true)
+    for (const p of base.produtosNovos) expect(ProdutoSchema.safeParse(p).success).toBe(true)
+  })
+
+  test('R2: linhas inválidas são reportadas com linha e motivo, nunca descartadas em silêncio nem zeradas', () => {
+    const csv = [
+      'produto;categoria;unidade;quantidade;tipo;data;preco_unit;validade',
+      'Glifosato 480;Defensivos e biológicos;L;20;entrada;01/09/2026;28,00;30/06/2028',
+      'Glifosato 480;Defensivos e biológicos;L;20;entrada;02/09/2026;-28,00;30/06/2028',
+      'Glifosato 480;Defensivos e biológicos;L;20;entrada;03/09/2026;28,00;31/02/2028',
+      'Glifosato 480;Defensivos e biológicos;L;0;saída;04/09/2026;;',
+      'Glifosato 480;Defensivos e biológicos;L;abc;saída;05/09/2026;;',
+      'Glifosato 480;Defensivos e biológicos;L;2;saída;06/09/2026;;',
+    ].join('\n')
+    const r = importarCsv(csv, { mapeamento: MAPEAMENTO_SIMULADO, origem: 'simulado', agora: HOJE, delimitador: ';', gerarId: geradorDeIds() })
+    expect(r.movimentacoes.map((m) => m.data)).toEqual(['2026-09-01', '2026-09-06'])
+    expect(r.erros.map((e) => e.linha)).toEqual([3, 4, 5, 6])
+    expect(r.erros[0].mensagem).toMatch(/^preco_unit: /)
+    expect(r.erros[1].mensagem).toMatch(/^validade: /)
+    expect(r.erros[2].mensagem).toMatch(/^quantidade: /)
+    expect(r.erros[3].mensagem).toContain('"abc" não é um número')
+    // Toda linha de dados termina como movimentação ou como erro.
+    expect(r.movimentacoes.length + r.erros.length).toBe(6)
+    expect(r.movimentacoes.some((m) => m.quantidade === 0 || m.preco_unit === 0)).toBe(false)
+  })
+
+  test('id fora do contrato (não UUID) é reportado, e o produto da linha recusada não é criado', () => {
+    const csv = 'produto;categoria;unidade;quantidade;tipo;data\nUreia;Fertilizantes;kg;10;entrada;01/09/2026\n'
+    const r = importarCsv(csv, { mapeamento: MAPEAMENTO_SIMULADO, origem: 'simulado', agora: HOJE, delimitador: ';', gerarId: () => 'sem-uuid' })
+    expect(r.movimentacoes).toEqual([])
+    expect(r.produtosNovos).toEqual([])
+    expect(r.erros).toEqual([{ linha: 2, mensagem: expect.stringMatching(/^id: /) }])
   })
 })

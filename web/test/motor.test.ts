@@ -5,7 +5,7 @@ import { CONFIG_PADRAO } from '../src/analise/config.ts'
 import { analisarProduto } from '../src/analise/consumo.ts'
 import { diaDe } from '../src/analise/datas.ts'
 import { importarCsv, lerCsv } from '../src/analise/importacao.ts'
-import type { Movimentacao, Produto, TipoAlerta } from '../src/analise/tipos.ts'
+import type { Movimentacao, Produto, TipoAlerta } from '@tetrarreme/contrato'
 import { geradorDeIds, mov, produto, retiradasPeriodicas } from './apoio.ts'
 
 const HOJE = new Date('2026-10-20T00:00:00Z')

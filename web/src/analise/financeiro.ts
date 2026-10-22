@@ -1,7 +1,7 @@
 // Resumo financeiro (pergunta 6). R2: todo total informa quantos itens ficaram sem preço.
 import type { AnaliseProduto } from './consumo.ts'
 import { arred } from './formatacao.ts'
-import type { Categoria } from './tipos.ts'
+import type { Categoria } from '@tetrarreme/contrato'
 
 export interface ValorProduto {
   produtoId: string

@@ -1,6 +1,6 @@
 import { diaDe } from '../datas.ts'
 import { arred } from '../formatacao.ts'
-import type { Confianca } from '../tipos.ts'
+import type { Confianca } from '@tetrarreme/contrato'
 import type { Detector } from './comum.ts'
 import { evidenciaBase } from './comum.ts'
 

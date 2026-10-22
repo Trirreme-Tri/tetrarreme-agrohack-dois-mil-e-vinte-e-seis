@@ -2,16 +2,8 @@
 // R2: valores ausentes viram `null`, nunca 0. R7: toda linha pertence a uma importação com origem.
 import { CONFIG_PADRAO } from './config.ts'
 import { normalizarNome, resolverProduto, sugerirProdutos } from './produtos.ts'
-import { CATEGORIAS } from './tipos.ts'
-import type {
-  Categoria,
-  Importacao,
-  Movimentacao,
-  Origem,
-  Produto,
-  ProdutoAlias,
-  TipoMovimentacao,
-} from './tipos.ts'
+import { CATEGORIAS, ImportacaoSchema, MovimentacaoSchema, ProdutoSchema, descreverErros } from '@tetrarreme/contrato'
+import type { Categoria, Movimentacao, Origem, Produto, ProdutoAlias, TipoMovimentacao, Importacao } from '@tetrarreme/contrato'
 import { UNIDADE_BASE_POR_DIMENSAO, converter, identificarUnidade, obterUnidade } from './unidades.ts'
 
 /** Campos internos que podem ser lidos do arquivo. */
@@ -50,6 +42,7 @@ export interface OpcoesImportacao {
   separadorDecimal?: ',' | '.'
   /** Substitui nomes de responsáveis por "Funcionário A", "Funcionário B"... (padrão: sim). */
   pseudonimizar?: boolean
+  /** Gera os ids (UUID, exigido pelo contrato para movimentações). */
   gerarId?: () => string
   similaridadeMinima?: number
 }
@@ -189,12 +182,12 @@ export function importarCsv(texto: string, opcoes: OpcoesImportacao): ResultadoI
     throw new Error('Toda importação precisa de origem "simulado" ou "oficial" (R7).')
   }
 
-  const importacao: Importacao = {
+  const importacao: Importacao = ImportacaoSchema.parse({
     id: gerarId(),
     origem,
     criada_em: agora.toISOString(),
     arquivo: opcoes.arquivo ?? null,
-  }
+  })
   const resultado: ResultadoImportacao = {
     importacao,
     movimentacoes: [],
@@ -236,40 +229,32 @@ export function importarCsv(texto: string, opcoes: OpcoesImportacao): ResultadoI
       const quantidade = numeroOuNulo(ler(linha, 'quantidade'), separadorDecimal)
       if (quantidade === null) throw new Error('quantidade não informada')
       const tipo = tipoMovimentacao(ler(linha, 'tipo'))
-      if (tipo !== 'ajuste' && quantidade <= 0) throw new Error('quantidade deve ser maior que zero')
       const data = dataOuNula(ler(linha, 'data'))
       if (data === null) throw new Error('data não informada')
       const estoqueMinimo = numeroOuNulo(ler(linha, 'estoque_minimo'), separadorDecimal)
 
-      let produto = resolverProduto(nome, existentes, aliases)
-      if (!produto) {
-        produto = {
-          id: gerarId(),
-          nome_canonico: nome,
-          categoria: categoriaOuErro(ler(linha, 'categoria')),
-          unidade_base_id: UNIDADE_BASE_POR_DIMENSAO[obterUnidade(unidadeId).dimensao],
-          estoque_minimo: null,
-        }
-        const candidatos = sugerirProdutos(nome, existentes, similaridadeMinima)
-        if (candidatos.length > 0) {
-          resultado.sugestoesUnificacao.push({
-            nomeNovo: nome,
-            produtoNovoId: produto.id,
-            candidatos: candidatos.map((c) => ({ produtoId: c.id, nome: c.nome_canonico })),
-          })
-        }
-        existentes.push(produto)
-        resultado.produtosNovos.push(produto)
+      const existente = resolverProduto(nome, existentes, aliases)
+      const produto: Produto = existente ?? {
+        id: gerarId(),
+        nome_canonico: nome,
+        categoria: categoriaOuErro(ler(linha, 'categoria')),
+        unidade_base_id: UNIDADE_BASE_POR_DIMENSAO[obterUnidade(unidadeId).dimensao],
+        estoque_minimo: null,
       }
       // R1: lança erro se a unidade da linha for de outra dimensão que a do produto.
       converter(quantidade, unidadeId, produto.unidade_base_id)
-      // Produtos já cadastrados não são alterados pela importação.
-      if (estoqueMinimo !== null && resultado.produtosNovos.includes(produto)) {
-        produto.estoque_minimo = converter(estoqueMinimo, unidadeId, produto.unidade_base_id)
-      }
+      // Produtos já cadastrados antes da importação não são alterados por ela.
+      const criadoAqui = !existente || resultado.produtosNovos.includes(existente)
+      const minimo =
+        criadoAqui && estoqueMinimo !== null
+          ? converter(estoqueMinimo, unidadeId, produto.unidade_base_id)
+          : produto.estoque_minimo
+      const produtoValidado = ProdutoSchema.safeParse({ ...produto, estoque_minimo: minimo })
+      if (!produtoValidado.success) throw new Error(`produto: ${descreverErros(produtoValidado.error)}`)
 
       const responsavel = textoOuNulo(ler(linha, 'responsavel'))
-      resultado.movimentacoes.push({
+      // Toda linha passa pelo contrato antes de entrar; a inválida é reportada, nunca corrigida.
+      const movimentacao = MovimentacaoSchema.safeParse({
         id: gerarId(),
         produto_id: produto.id,
         nome_original: nome,
@@ -287,6 +272,22 @@ export function importarCsv(texto: string, opcoes: OpcoesImportacao): ResultadoI
         criado_em: agora.toISOString(),
         dispositivo: 'importacao',
       })
+      if (!movimentacao.success) throw new Error(descreverErros(movimentacao.error))
+
+      if (!existente) {
+        const candidatos = sugerirProdutos(nome, existentes, similaridadeMinima)
+        if (candidatos.length > 0) {
+          resultado.sugestoesUnificacao.push({
+            nomeNovo: nome,
+            produtoNovoId: produto.id,
+            candidatos: candidatos.map((c) => ({ produtoId: c.id, nome: c.nome_canonico })),
+          })
+        }
+        existentes.push(produto)
+        resultado.produtosNovos.push(produto)
+      }
+      produto.estoque_minimo = minimo
+      resultado.movimentacoes.push(movimentacao.data)
     } catch (e) {
       resultado.erros.push({ linha: numeroLinha, mensagem: (e as Error).message })
     }

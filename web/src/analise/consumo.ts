@@ -1,7 +1,7 @@
 // Saldo por lote, consumo médio, cobertura e confiança (R3: calculada aqui, nunca armazenada).
 import type { ConfigAnalise } from './config.ts'
 import { diaDe } from './datas.ts'
-import type { Confianca, Movimentacao, Produto } from './tipos.ts'
+import type { Confianca, Movimentacao, Produto } from '@tetrarreme/contrato'
 import { converter } from './unidades.ts'
 
 const EPSILON = 1e-9

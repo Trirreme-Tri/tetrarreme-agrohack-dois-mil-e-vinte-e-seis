@@ -9,7 +9,7 @@ import { DETECTORES } from './detectores/index.ts'
 import { resumirFinanceiro } from './financeiro.ts'
 import type { ResumoFinanceiro } from './financeiro.ts'
 import { comMensagem } from './mensagens.ts'
-import type { Alerta, Importacao, Movimentacao, NivelAlerta, Origem, Produto } from './tipos.ts'
+import type { Alerta, Importacao, Movimentacao, NivelAlerta, Origem, Produto } from '@tetrarreme/contrato'
 
 export interface OpcoesAnalise {
   config?: ConfigAnalise
