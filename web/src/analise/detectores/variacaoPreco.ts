@@ -5,9 +5,9 @@ import type { Detector } from './comum.ts'
 import { evidenciaBase } from './comum.ts'
 
 /** Última compra com preço difere mais que o limite da média das compras anteriores. */
-export const detectarVariacaoPreco: Detector = ({ analises, hojeDia, config }) =>
+export const detectarVariacaoPreco: Detector = ({ analises, hojeDia }) =>
   analises.flatMap((a) => {
-    const c = config.variacaoPreco
+    const c = a.limites.variacaoPreco
     const ultima = a.compras.at(-1)
     const anteriores = a.compras.slice(0, -1)
     if (!ultima || anteriores.length < c.minimoComprasAnteriores) return []

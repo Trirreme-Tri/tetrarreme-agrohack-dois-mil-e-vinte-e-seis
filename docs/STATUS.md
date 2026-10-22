@@ -3,7 +3,7 @@
 > Atualizado pelo Claude Code ao fim de cada sessão. Enviado ao Projeto do claude.ai para revisão.
 
 ## Última atualização
-22/10/2026 — Sessão 2 + adendos (contrato de dados; sem base oficial)
+22/10/2026 — Sessão 2 + adendos (contrato de dados; sem base oficial; limites em três níveis)
 
 ## Feito nesta sessão
 - Pendências registradas neste arquivo.
@@ -32,12 +32,15 @@
   Testes de detecção usam essa base e a data de referência exportada pelo gerador.
 - Heurística de duplicidade refinada (palavra a palavra), para não confundir "Calcário calcítico" com
   "Calcário dolomítico" e continuar pegando "Glifozato 480" × "Glifosato 480".
+- Limites em três níveis no `config.ts`: padrão geral → por categoria → por produto (`resolverLimites`).
+  Cada produto recebe seus limites efetivos na análise (`AnaliseProduto.limites`). Começa só com o padrão;
+  as 8 categorias estão prontas e vazias para o Victor preencher.
 
 ## Testes
-`npm test` na raiz (todos os workspaces): **131 testes, 131 passaram**.
+`npm test` na raiz (todos os workspaces): **138 testes, 138 passaram**.
 - `contrato/`: 27 testes (`contrato.test.ts`: válidos e inválidos de cada schema).
-- `web/`: 104 testes (`conformidade.test.ts`, `deteccao.test.ts` — 13 situações, 31 produtos normais,
-  determinismo do gerador —, `motor.test.ts`).
+- `web/`: 111 testes (`conformidade.test.ts`, `deteccao.test.ts` — 13 situações, 31 produtos normais,
+  determinismo do gerador —, `motor.test.ts`, `config.test.ts` — três níveis de limites).
 
 Também passam `npm run typecheck` (os dois workspaces), `oxlint` e `vite build`.
 
@@ -45,6 +48,7 @@ Também passam `npm run typecheck` (os dois workspaces), `oxlint` e `vite build`
 - Banco Neon; backend Cloudflare Workers com Hono.
 - Contrato de dados único em `contrato/` (Zod), compartilhado por interface, motor e API; monorepo com npm workspaces.
 - Sem base oficial: demonstração com a base simulada; importador continua com mapeamento configurável.
+- Limites em três níveis (padrão → categoria → produto); produto indexado pelo nome canônico.
 - Interpretações da especificação no motor, todas registradas em `docs/DECISOES.md` (21/10/2026). Principais:
   níveis de cada tipo de alerta; limites adicionais provisórios em `config.ts` (horizonte de vencimento,
   janela da retirada atípica, piso do MAD, regras da variação de preço); definição do `valorEnvolvido` de
@@ -68,12 +72,14 @@ Também passam `npm run typecheck` (os dois workspaces), `oxlint` e `vite build`
 - Claude Code registrou as decisões de interpretação em `docs/DECISOES.md` e atualizou o README.
 - Claude Code criou o pacote `contrato/` (schemas Zod e testes) e migrou o motor e o importador para ele (adendo).
 - Claude Code reescreveu o gerador da base simulada (44 produtos, 12 meses) e refinou a heurística de duplicidade (adendo sem base oficial).
+- Claude Code reorganizou os limites em três níveis e escreveu os testes de precedência.
 - Pendente: revisão humana do código e dos limites (coluna "Revisão pela equipe" do README).
 
 ## Pendências e bloqueios
 - Base oficial de dados: Organização não fornecerá a base; confirmação formal pendente.
 - Prazo de entrega do repositório: não divulgado.
-- Limites dos alertas (`web/src/analise/config.ts`): provisórios, aguardando calibração do Victor.
+- Limites dos alertas (`web/src/analise/config.ts`): provisórios, aguardando calibração do Victor;
+  `porCategoria` pronto e vazio para ele preencher.
 - Provisionamento: conta Neon e conta Cloudflare a cargo do Leonardo (variáveis de ambiente
   serão fornecidas como secrets do Codespaces, nunca commitadas).
 - Nomes de produtos da base simulada: o texto do Anexo III não estava disponível nesta sessão;

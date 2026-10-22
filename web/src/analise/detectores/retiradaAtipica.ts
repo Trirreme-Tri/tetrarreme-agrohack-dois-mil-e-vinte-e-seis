@@ -14,9 +14,9 @@ export function mediana(valores: readonly number[]): number {
  * Retirada recente > mediana + k × MAD das retiradas anteriores do produto.
  * Exige um mínimo de retiradas anteriores.
  */
-export const detectarRetiradaAtipica: Detector = ({ analises, hojeDia, config }) =>
+export const detectarRetiradaAtipica: Detector = ({ analises, hojeDia }) =>
   analises.flatMap((a) => {
-    const c = config.retiradaAtipica
+    const c = a.limites.retiradaAtipica
     const alertas: AlertaSemMensagem[] = []
     a.saidas.forEach((s, i) => {
       if (hojeDia - diaDe(s.data) >= c.janelaRecenteDias) return

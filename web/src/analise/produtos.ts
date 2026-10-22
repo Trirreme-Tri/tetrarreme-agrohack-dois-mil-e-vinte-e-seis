@@ -54,7 +54,7 @@ function levenshtein(a: string, b: string): number {
   return linha[b.length]
 }
 
-/** Critério de semelhança de nomes (vem de `config.duplicidade`). */
+/** Critério de semelhança de nomes (vem de `config.globais.duplicidade`). */
 export interface CriterioDuplicidade {
   similaridadeMinima: number
   similaridadePalavra: number

@@ -8,7 +8,7 @@ export const detectarPossivelDuplicidade: Detector = ({ analises, config }) => {
   const porId = new Map(analises.map((a) => [a.produto.id, a]))
   return sugerirDuplicidades(
     analises.map((a) => a.produto),
-    config.duplicidade,
+    config.globais.duplicidade,
   ).map(({ produtoA, produtoB, similaridade }) => {
     // O alerta fica no produto cadastrado por último (o provável apelido).
     const a = porId.get(produtoB.id)!

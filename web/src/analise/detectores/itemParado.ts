@@ -5,7 +5,7 @@ import { evidenciaBase } from './comum.ts'
 
 /** Valor em estoque entre os maiores (padrão: top 20%) e sem saída há mais de N dias. */
 export const detectarItemParado: Detector = ({ analises, hojeDia, config }) => {
-  const { fracaoTopValor, diasSemSaida } = config.itemParado
+  const fracaoTopValor = config.globais.itemParadoFracaoTopValor
   const comValor = analises
     .filter((a) => a.saldo > 0 && a.valorEstoque !== null && a.valorEstoque > 0)
     .sort((x, y) => y.valorEstoque! - x.valorEstoque!)
@@ -14,6 +14,7 @@ export const detectarItemParado: Detector = ({ analises, hojeDia, config }) => {
     const referencia = a.ultimaSaida ?? a.primeiraEntrada ?? a.primeiraMovimentacao
     if (referencia === null) return []
     const dias = hojeDia - diaDe(referencia)
+    const { diasSemSaida } = a.limites.itemParado
     if (dias <= diasSemSaida) return []
     return [
       {

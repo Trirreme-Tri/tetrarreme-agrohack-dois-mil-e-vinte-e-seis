@@ -10,9 +10,9 @@ import { evidenciaBase, valor } from './comum.ts'
  * Os lotes são consumidos na ordem de validade (o que vence primeiro sai primeiro).
  * Lote sem validade nunca é considerado vencido (R2).
  */
-export const detectarVencimento: Detector = ({ analises, hojeDia, config }) =>
+export const detectarVencimento: Detector = ({ analises, hojeDia }) =>
   analises.flatMap((a) => {
-    const { horizonteDias, diasParaCritico } = config.vencimento
+    const { horizonteDias, diasParaCritico } = a.limites.vencimento
     const lotes = a.lotes.filter((l) => l.saldo > 0 && l.validade !== null).sort((x, y) => (x.validade! < y.validade! ? -1 : 1))
     const alertas: AlertaSemMensagem[] = []
     let consumidoAntes = 0

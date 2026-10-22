@@ -45,7 +45,7 @@ export interface OpcoesImportacao {
   pseudonimizar?: boolean
   /** Gera os ids (UUID, exigido pelo contrato para movimentações). */
   gerarId?: () => string
-  /** Critério para sugerir unificação de nomes novos (padrão: `CONFIG_PADRAO.duplicidade`). */
+  /** Critério para sugerir unificação de nomes novos (padrão: `CONFIG_PADRAO.globais.duplicidade`). */
   duplicidade?: CriterioDuplicidade
 }
 
@@ -178,7 +178,7 @@ export function importarCsv(texto: string, opcoes: OpcoesImportacao): ResultadoI
     separadorDecimal = ',',
     pseudonimizar = true,
     gerarId = () => crypto.randomUUID(),
-    duplicidade = CONFIG_PADRAO.duplicidade,
+    duplicidade = CONFIG_PADRAO.globais.duplicidade,
   } = opcoes
   if (origem !== 'simulado' && origem !== 'oficial') {
     throw new Error('Toda importação precisa de origem "simulado" ou "oficial" (R7).')

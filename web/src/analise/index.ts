@@ -1,7 +1,7 @@
 // Motor de análise de insumos: TypeScript puro, sem UI, rede ou banco.
 // Os tipos do modelo de dados vêm de @tetrarreme/contrato.
-export { CONFIG_PADRAO } from './config.ts'
-export type { ConfigAnalise } from './config.ts'
+export { CONFIG_PADRAO, resolverLimites } from './config.ts'
+export type { AjusteLimites, ConfigAnalise, Limites, LimitesGlobais } from './config.ts'
 export * from './unidades.ts'
 export * from './produtos.ts'
 export * from './importacao.ts'

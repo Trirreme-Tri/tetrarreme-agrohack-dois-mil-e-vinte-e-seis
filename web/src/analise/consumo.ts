@@ -1,5 +1,5 @@
 // Saldo por lote, consumo médio, cobertura e confiança (R3: calculada aqui, nunca armazenada).
-import type { ConfigAnalise } from './config.ts'
+import type { Limites } from './config.ts'
 import { diaDe } from './datas.ts'
 import type { Confianca, Movimentacao, Produto } from '@tetrarreme/contrato'
 import { converter } from './unidades.ts'
@@ -34,6 +34,8 @@ export interface CompraBase {
 
 export interface AnaliseProduto {
   produto: Produto
+  /** Limites efetivos deste produto (padrão geral ← categoria ← produto). */
+  limites: Limites
   /** Saldo total na unidade base. */
   saldo: number
   lotes: SaldoLote[]
@@ -70,7 +72,7 @@ export function precoBase(m: Movimentacao, produto: Produto): number | null {
 export function calcularConfianca(
   totalSaidas: number,
   diasHistorico: number,
-  c: ConfigAnalise['confianca'],
+  c: Limites['confianca'],
 ): Confianca {
   if (totalSaidas < c.saidasInsuficiente) return 'insuficiente'
   if (totalSaidas < c.saidasBaixa || diasHistorico < c.historicoMinimoDias) return 'baixa'
@@ -149,7 +151,7 @@ export function analisarProduto(
   produto: Produto,
   movsDoProduto: readonly Movimentacao[],
   hojeDia: number,
-  config: ConfigAnalise,
+  limites: Limites,
 ): AnaliseProduto {
   const movs = ordenarMovimentacoes(movsDoProduto, hojeDia)
   const lotes = calcularLotes(produto, movs)
@@ -166,7 +168,7 @@ export function analisarProduto(
 
   const primeiraMovimentacao = movs[0]?.data ?? null
   const diasHistorico = primeiraMovimentacao === null ? 0 : hojeDia - diaDe(primeiraMovimentacao)
-  const diasJanela = Math.max(1, Math.min(config.janelaConsumoDias, diasHistorico))
+  const diasJanela = Math.max(1, Math.min(limites.janelaConsumoDias, diasHistorico))
   const consumoJanela = saidas
     .filter((s) => hojeDia - diaDe(s.data) < diasJanela)
     .reduce((t, s) => t + s.quantidade, 0)
@@ -182,12 +184,13 @@ export function analisarProduto(
 
   return {
     produto,
+    limites,
     saldo,
     lotes,
     consumoDiario,
     diasJanela,
     cobertura,
-    confianca: calcularConfianca(saidas.length, diasHistorico, config.confianca),
+    confianca: calcularConfianca(saidas.length, diasHistorico, limites.confianca),
     totalSaidas: saidas.length,
     diasHistorico,
     primeiraMovimentacao,

@@ -6,8 +6,8 @@ import { evidenciaBase } from './comum.ts'
 /** Extra (Victor): lote de defensivo zerado → devolver as embalagens vazias dentro do prazo. */
 export const detectarDevolucaoEmbalagem: Detector = ({ analises, hojeDia, config }) =>
   analises.flatMap((a) => {
-    const { categoria, prazoDias } = config.devolucaoEmbalagem
-    if (a.produto.categoria !== categoria) return []
+    if (!config.globais.categoriasDevolucaoEmbalagem.includes(a.produto.categoria)) return []
+    const { prazoDias } = a.limites.devolucaoEmbalagem
     return a.lotes
       .filter((l) => l.zeradoEm !== null && l.primeiraEntrada !== null)
       .filter((l) => hojeDia <= diaDe(l.primeiraEntrada!) + prazoDias)

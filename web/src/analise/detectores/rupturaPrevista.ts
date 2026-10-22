@@ -2,9 +2,9 @@ import type { Detector } from './comum.ts'
 import { evidenciaBase, evidenciaConsumo, valor } from './comum.ts'
 
 /** Cobertura entre os limites (padrão: 7 a 30 dias). */
-export const detectarRupturaPrevista: Detector = ({ analises, config }) =>
+export const detectarRupturaPrevista: Detector = ({ analises }) =>
   analises.flatMap((a) => {
-    const { coberturaMinimaDias: min, coberturaMaximaDias: max } = config.rupturaPrevista
+    const { coberturaMinimaDias: min, coberturaMaximaDias: max } = a.limites.rupturaPrevista
     const minimo = a.produto.estoque_minimo
     if (minimo !== null && a.saldo <= minimo) return [] // já é estoque crítico
     if (a.confianca === 'insuficiente' || a.cobertura === null) return []
@@ -18,7 +18,7 @@ export const detectarRupturaPrevista: Detector = ({ analises, config }) =>
         regra: `Saldo para ${min} a ${max} dias, pelo consumo médio dos últimos ${a.diasJanela} dias.`,
         confianca: a.confianca,
         recomendacao: 'Planejar a compra considerando o prazo de entrega do fornecedor.',
-        valorEnvolvido: valor(a.consumoDiario * config.diasReposicao, a.precoMedio),
+        valorEnvolvido: valor(a.consumoDiario * a.limites.diasReposicao, a.precoMedio),
       },
     ]
   })

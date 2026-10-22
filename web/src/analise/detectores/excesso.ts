@@ -3,9 +3,9 @@ import type { Detector } from './comum.ts'
 import { evidenciaBase, evidenciaConsumo, valor } from './comum.ts'
 
 /** Cobertura acima do limite (padrão: 180 dias). */
-export const detectarExcesso: Detector = ({ analises, config }) =>
+export const detectarExcesso: Detector = ({ analises }) =>
   analises.flatMap((a) => {
-    const limite = config.excesso.coberturaMinimaDias
+    const limite = a.limites.excesso.coberturaMinimaDias
     if (a.confianca === 'insuficiente' || a.cobertura === null || a.cobertura <= limite) return []
     const excedente = a.saldo - a.consumoDiario * limite
     return [

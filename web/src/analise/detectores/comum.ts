@@ -7,6 +7,7 @@ import { obterUnidade } from '../unidades.ts'
 export interface ContextoDeteccao {
   analises: readonly AnaliseProduto[]
   hojeDia: number
+  /** Limites por produto ficam em `AnaliseProduto.limites`; aqui só os globais são usados. */
   config: ConfigAnalise
 }
 

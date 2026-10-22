@@ -4,9 +4,9 @@ import type { Detector } from './comum.ts'
 import { evidenciaBase, valor } from './comum.ts'
 
 /** Consumo dos últimos N dias > fator × os N dias anteriores. */
-export const detectarConsumoCrescente: Detector = ({ analises, hojeDia, config }) =>
+export const detectarConsumoCrescente: Detector = ({ analises, hojeDia }) =>
   analises.flatMap((a) => {
-    const { janelaDias: n, fatorAumento } = config.consumoCrescente
+    const { janelaDias: n, fatorAumento } = a.limites.consumoCrescente
     if (a.confianca === 'insuficiente') return []
     let recente = 0
     let anterior = 0

@@ -65,7 +65,7 @@ describe('R1 — unidades diferentes nunca são somadas sem conversão', () => {
       mov({ produto_id: 'inseticida', tipo: 'saida', quantidade: 250, unidade_id: 'mL', data: '2026-09-10' }),
       mov({ produto_id: 'inseticida', tipo: 'saida', quantidade: 0.5, unidade_id: 'L', data: '2026-09-20' }),
     ]
-    expect(analisarProduto(p, movs, diaDe('2026-10-20'), CONFIG_PADRAO).saldo).toBeCloseTo(1.25)
+    expect(analisarProduto(p, movs, diaDe('2026-10-20'), CONFIG_PADRAO.padrao).saldo).toBeCloseTo(1.25)
   })
 
   test('R1: movimentação em dimensão diferente da do produto interrompe a análise', () => {
@@ -148,7 +148,7 @@ describe('R2 — ausência de validade ou preço não é zero', () => {
 
 describe('R3 — pouco histórico comunica incerteza', () => {
   test('R3: níveis de confiança seguem os limites da configuração', () => {
-    const c = CONFIG_PADRAO.confianca
+    const c = CONFIG_PADRAO.padrao.confianca
     expect(calcularConfianca(2, 365, c)).toBe('insuficiente')
     expect(calcularConfianca(4, 365, c)).toBe('baixa')
     expect(calcularConfianca(20, 20, c)).toBe('baixa')
@@ -351,7 +351,7 @@ describe('R8 — produtos com nomes diferentes', () => {
     const glifosato = produto({ id: 'gli', nome_canonico: 'Glifosato 480' })
     expect(resolverProduto('glifosato 480', [glifosato], [])).toBe(glifosato)
     expect(resolverProduto('Glifosato Atar 480', [glifosato], [])).toBeNull()
-    expect(sugerirProdutos('Glifozato 480', [glifosato], CONFIG_PADRAO.duplicidade)).toEqual([glifosato])
+    expect(sugerirProdutos('Glifozato 480', [glifosato], CONFIG_PADRAO.globais.duplicidade)).toEqual([glifosato])
 
     const naoConfirmado = { nome_original: 'Glifosato Atar 480', produto_id: 'gli', confirmado: false }
     expect(resolverProduto('Glifosato Atar 480', [glifosato], [naoConfirmado])).toBeNull()
@@ -367,7 +367,7 @@ describe('R8 — produtos com nomes diferentes', () => {
   })
 
   test('R8: palavras diferentes não viram duplicidade, mesmo com nomes parecidos', () => {
-    const criterio = CONFIG_PADRAO.duplicidade
+    const criterio = CONFIG_PADRAO.globais.duplicidade
     const calcitico = produto({ id: 'a', nome_canonico: 'Calcário calcítico', categoria: 'Corretivos' })
     const dolomitico = produto({ id: 'b', nome_canonico: 'Calcário dolomítico', categoria: 'Corretivos' })
     expect(sugerirDuplicidades([calcitico, dolomitico], criterio)).toEqual([])
