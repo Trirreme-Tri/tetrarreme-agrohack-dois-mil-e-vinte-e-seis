@@ -4,6 +4,7 @@ import { analisar } from '../src/analise/analisar.ts'
 import { limitesPara } from '../src/analise/config.ts'
 import { analisarProduto } from '../src/analise/consumo.ts'
 import { diaDe } from '../src/analise/datas.ts'
+import { fmtCobertura } from '../src/analise/formatacao.ts'
 import { importarCsv, lerCsv } from '../src/analise/importacao.ts'
 import type { Movimentacao, Produto, TipoAlerta } from '@tetrarreme/contrato'
 import { geradorDeIds, mov, produto, retiradasPeriodicas } from './apoio.ts'
@@ -154,5 +155,59 @@ describe('Limites dos detectores', () => {
     ]
     expect(tipos(movs('d'), [def])).toEqual(['devolucao_embalagem'])
     expect(tipos(movs('f'), [fert])).toEqual([])
+  })
+})
+
+describe('Consumo zero na janela (ex.: fertilizante fora da safra)', () => {
+  const p = produto({ id: 'map', categoria: 'Fertilizantes' })
+  // Comprado e usado em março; nenhuma retirada nos últimos 60 dias.
+  const movs = [
+    mov({ produto_id: 'map', tipo: 'entrada', quantidade: 3000, data: '2026-03-01', preco_unit: 4 }),
+    ...retiradasPeriodicas('map', '2026-03-30', 10, 3, 100),
+  ]
+
+  /** Todos os números do objeto são finitos (nada de Infinity nem NaN). */
+  function numerosFinitos(valor: unknown): boolean {
+    if (typeof valor === 'number') return Number.isFinite(valor)
+    if (valor && typeof valor === 'object') return Object.values(valor).every(numerosFinitos)
+    return true
+  }
+
+  test('cobertura é null (nunca infinita) e aparece como "sem consumo recente"', () => {
+    const r = analisar(movs, [p], HOJE)
+    const a = r.produtos[0]
+    expect(a.saldo).toBe(2000)
+    expect(a.consumoDiario).toBe(0)
+    expect(a.cobertura).toBeNull()
+    expect(a.confianca).toBe('insuficiente')
+    expect(fmtCobertura(a.cobertura)).toBe('sem consumo recente')
+    expect(fmtCobertura(Infinity)).toBe('sem consumo recente')
+    expect(fmtCobertura(12.7)).toBe('12 dias')
+    expect(numerosFinitos(r)).toBe(true)
+    expect(JSON.stringify(r)).not.toMatch(/Infinity|NaN/)
+  })
+
+  test('não dispara ruptura nem excesso', () => {
+    const tiposDoProduto = analisar(movs, [p], HOJE).alertas.map((a) => a.tipo)
+    expect(tiposDoProduto).not.toContain('ruptura_prevista')
+    expect(tiposDoProduto).not.toContain('excesso')
+    expect(tiposDoProduto).not.toContain('estoque_critico')
+  })
+
+  test('com saldo no mínimo, estoque crítico dispara sem número de dias', () => {
+    const alertas = analisar(movs, [{ ...p, estoque_minimo: 2500 }], HOJE).alertas
+    const critico = alertas.filter((a) => a.tipo === 'estoque_critico')
+    expect(critico).toHaveLength(1)
+    expect(alertas.map((a) => a.tipo)).not.toContain('ruptura_prevista')
+    expect(critico[0].evidencia.coberturaDias).toBeNull()
+    expect(critico[0].mensagem).toContain('Não há histórico suficiente')
+    expect(critico[0].mensagem).not.toMatch(/\d+ dias/)
+  })
+
+  test('saldo zero e consumo zero: nenhum alerta e nenhuma cobertura', () => {
+    const zerado = [...movs, mov({ produto_id: 'map', tipo: 'saida', quantidade: 2000, data: '2026-04-15' })]
+    const r = analisar(zerado, [p], HOJE)
+    expect(r.produtos[0]).toMatchObject({ saldo: 0, cobertura: null })
+    expect(r.alertas).toEqual([])
   })
 })

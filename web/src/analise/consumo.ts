@@ -45,7 +45,10 @@ export interface AnaliseProduto {
   consumoDiario: number
   /** Dias efetivamente usados na média (menor entre a janela e o histórico). */
   diasJanela: number
-  /** Dias que o saldo deve durar; `null` quando não há consumo recente. */
+  /**
+   * Dias que o saldo deve durar. `null` quando não há consumo na janela (ex.: fertilizante fora
+   * da safra): nunca infinito. Sem cobertura, não há ruptura nem excesso; estoque crítico só pelo mínimo.
+   */
   cobertura: number | null
   confianca: Confianca
   totalSaidas: number
