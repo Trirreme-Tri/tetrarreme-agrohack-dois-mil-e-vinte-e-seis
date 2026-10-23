@@ -3,81 +3,77 @@
 > Atualizado pelo Claude Code ao fim de cada sessão. Enviado ao Projeto do claude.ai para revisão.
 
 ## Última atualização
-22/10/2026 — Sessão 3 (ajustes da revisão de conformidade + adendo sobre o `config.ts`)
+23/10/2026 — Sessão 4 (ajustes do motor, dados locais e interface)
 
 ## Feito nesta sessão
-- **Parte 1 — Anexo III:** tabela de exemplos por categoria copiada para o `CLAUDE.md` (seção 5).
-  Catálogo do `data/simulados/gerar.ts` refeito com **todos** os 52 exemplos do Anexo (genéricos
-  especificados) + 2 extras só para as situações de duplicidade ("UREIA 45%", "Herbicida glifozato 480");
-  53 produtos, 2.229 movimentações. Mapa "exemplo do Anexo → produto" exportado (`ANEXO_III`) e
-  publicado no `SITUACOES.md`. Os três "filtros" (peças, irrigação, EPI) são produtos distintos e
-  nunca sugeridos para unificação (teste). `excesso` plantado passou para o óleo hidráulico e
-  `item_parado` para a sobra de calcário da safra passada (superfosfato saiu: não está no Anexo).
-- **Parte 2 — origem do limite:** função única `limitesPara(produto, config)` resolve os limites e a
-  origem de cada um; os detectores não leem a config (recebem limites por produto e os globais).
-  Todo alerta registra na evidência (`origemLimite`) e no fim da regra de qual nível veio o limite
-  ("limite da categoria Fertilizantes", "limite do padrão geral", "limite do produto X").
-- **Adendo 1 — confiança (R3):** conta só as saídas dentro da janela do consumo médio.
-- **Adendo 2 — consumo zero:** cobertura `null` (nunca infinita), exibida como "sem consumo recente"
-  (`fmtCobertura`); sem ruptura nem excesso; estoque crítico só pelo mínimo, sem dias.
-- **Adendo 3 — chaves órfãs:** `analisar()` devolve `avisosConfiguracao` quando uma chave de
-  `porProduto` não corresponde a nenhum produto (separado dos alertas de estoque).
-- **Adendo 4 — embalagem:** nível progressivo (informativo; atenção a ≤ 60 dias do prazo; crítico a
-  ≤ 15 dias), valores provisórios; a mensagem informa quantos dias faltam.
-- **Parte 3 — insumos sazonais:** Fertilizantes e Corretivos com `excesso` > 365 dias e
-  `item_parado` > 180 dias (`// PROVISÓRIO — calibrar com o Victor`). Compras anuais normais de MAP
-  e gesso na base; testes mostram que sem o ajuste elas seriam falsos alarmes, e que o excesso e o
-  item parado plantados continuam disparando.
-- **Parte 4:** `docs/PERGUNTAS_VICTOR.md` (9 blocos de perguntas, valor atual e chave da config).
-- **Parte 5:** `docs/REVISAO.md` (mapa de responsáveis, ficha por arquivo com 3 perguntas da banca,
-  roteiro de 15 minutos e caixa de verificação por pessoa). A coluna "Revisão pela equipe" do
-  README **não** foi preenchida.
+- **Parte 1 — motor:**
+  - `avisosDados` (saldo negativo no total ou em lote), separado dos alertas;
+  - `excesso` sem consumo: cobertura nula e saldo > 10 × estoque mínimo (PROVISÓRIO), nova situação
+    plantada (lâmina de roçadeira); 40 normais e compras sazonais continuam sem alerta;
+  - resumo financeiro com uma definição só: `valorConhecido`, `itensSemPreco`, `lotesComPrecoMedio`, `estimado`;
+  - `serieDoProduto`: consumo por mês e por semana e série do saldo com entradas (pergunta 3);
+  - confiança `fato` no contrato (lote vencido, duplicidade, embalagem, variação de preço, excesso sem consumo);
+  - evidência de reposição (30 dias) e frase curta dos cartões (`gerarResumo`) geradas no motor;
+  - ordem estável das movimentações no mesmo dia (entradas, ajustes, saídas) e alerta de duplicidade
+    no produto que apareceu por último — o IndexedDB não devolve na ordem do arquivo.
+- **Parte 2 — dados locais (Dexie):** tabelas do contrato + `decisoes_duplicidade`, `cadastro`,
+  `preferencias`; carga inicial da base simulada com **deslocamento de datas** (base termina hoje);
+  registros com data real, validados pelo contrato e nunca bloqueados por saldo; "Sim, é o mesmo"
+  grava apelido confirmado (unificação na análise, sem editar registros); "Não, são diferentes"
+  persiste; perfil, funcionário e tema guardados no aparelho; botão "Recarregar dados simulados".
+- **Parte 3 — interface (Monitora):** painel do dono (celular e computador, filtro por categoria,
+  painel vazio, avisos de dados), detalhe do alerta (evidência, regra com origem do limite,
+  confiança, recomendação, botões de duplicidade), fluxo do funcionário (perfil → quem → início →
+  produto → quantidade → destino → registrado), registrar entrada (lote, validade DD/MM/AAAA,
+  "não tem validade", preço opcional), detalhe do produto (lotes, consumo por mês/semana, saldo,
+  retirada atípica destacada), resumo financeiro, lista de produtos com alerta primeiro. Temas claro
+  e escuro, fontes locais, PWA (verificado offline), selo "Dados simulados", indicador de conexão.
+- **Parte 4 — testes:** integração com fake-indexeddb + Testing Library (carga inicial = alertas do
+  motor; reanálise do glifosato ruptura → crítico pelo fluxo do funcionário; "Não, são diferentes"
+  persiste após recarregar); deslocamento de datas (base deslocada = mesmos alertas).
+- **Parte 5 — publicação:** `npm run build` gera `web/dist`; README (seções 2, 3, 4 e 8) com o passo a
+  passo do Cloudflare Pages.
+- Capturas de tela em `docs/capturas/` (16 imagens).
 
 ## Testes
-`npm test` na raiz: **170 testes, 170 passaram**.
-- `contrato/`: 27 (`contrato.test.ts`).
-- `web/`: 143 em 4 arquivos — `conformidade.test.ts` (R1–R8, contrato, filtros), `deteccao.test.ts`
-  (13 situações, 40 produtos normais, catálogo do Anexo III, determinismo do gerador),
-  `motor.test.ts` (módulos, limites de cada detector, consumo zero, embalagem progressiva),
-  `config.test.ts` (três níveis, origem do limite, chaves órfãs, insumos sazonais).
+`npm test` na raiz: **206 testes, 206 passaram**.
+- `contrato/`: 28.
+- `web/`: 178 em 7 arquivos — `conformidade`, `deteccao` (14 situações, 40 normais), `motor`,
+  `config`, `avisos-financeiro-serie`, `dados` (Dexie + deslocamento), `interface` (jsdom).
 
-Também passam `npm run typecheck` (contrato e web), `oxlint` (0 avisos) e `vite build`.
+Também passam `npm run typecheck`, `oxlint` (0 avisos) e `npm run build`.
 
-## Decisões tomadas (detalhes em `docs/DECISOES.md`)
-- Confiança conta só as saídas da janela (substitui a decisão de 21/10).
-- Consumo zero: cobertura nula, nunca infinita; sem ruptura nem excesso.
-- Avisos de configuração para chaves órfãs de `porProduto`.
-- Embalagem com nível progressivo (60 / 15 dias, provisórios).
-- Limites sazonais para Fertilizantes e Corretivos (365 / 180 dias, provisórios).
-- Base simulada alinhada ao Anexo III; filtros distintos nas três categorias.
+## Decisões tomadas (detalhes em `docs/DECISOES.md`, 23/10/2026)
+- Deslocamento de datas da base simulada na carga; "hoje" = data local do aparelho.
+- Registros do aparelho na importação "registros no aparelho", origem `simulado`.
+- Valor estimado com definição única; confiança `fato`; excesso sem consumo (10 × mínimo, provisório).
+- Design só como referência visual; números sempre do motor; ordem dos alertas pela R5.
+- PWA com Workbox; Cloudflare Pages (`web/dist`, Node 24).
 
 ## Regras R1–R8: situação
 | Regra | Implementada | Testada |
 |---|---|---|
-| R1 | Sim — `unidades.ts`; conversão em saldo, consumo, preço e importação | Sim |
-| R2 | Sim — ausentes → `null` na importação e no contrato; linha inválida reportada com motivo; resumo financeiro conta itens sem preço; "sem preço" e "sem consumo recente" na exibição | Sim |
-| R3 | Sim — confiança calculada na análise com as saídas da janela; sem dias quando insuficiente | Sim |
-| R4 | Sim — alerta estruturado (validado pelo contrato); mensagem gerada dos campos; regra e evidência informam a origem do limite | Sim |
-| R5 | Sim — `ordenarAlertas` (nível, depois maior valor envolvido) | Sim |
-| R6 | Sim — `analisar` puro; `hoje` é parâmetro; nada persistido | Sim |
-| R7 | Sim — toda movimentação aponta para uma importação com origem; base marcada SIMULADO. Falta a UI mostrar a origem | Sim (motor) |
-| R8 | Sim — sugestão sem unificação automática; números diferentes nunca se unem; filtros distintos | Sim |
+| R1 | Sim — conversão em saldo, consumo, preço, importação e registro (unidade de outra dimensão é recusada) | Sim |
+| R2 | Sim — ausentes `null`; "Sem preço" e "sem consumo recente" na tela; valor estimado explicado | Sim |
+| R3 | Sim — confiança pela janela; sem dias com histórico insuficiente (motor e frase curta) | Sim |
+| R4 | Sim — mensagem, frase curta e evidência geradas dos campos; origem do limite na tela | Sim |
+| R5 | Sim — painel na ordem do motor (testado na integração) | Sim |
+| R6 | Sim — cada registro dispara nova análise; painel atualiza (teste de integração) | Sim |
+| R7 | Sim — origem em toda movimentação; selo "Dados simulados" sempre visível | Sim |
+| R8 | Sim — confirmação humana persistente; "diferente" não volta; números diferentes nunca unem | Sim |
 
 ## Apoio de IA nesta sessão
-- Claude Code implementou as partes 1 a 3 e o adendo (código, base simulada e testes) e escreveu
-  `PERGUNTAS_VICTOR.md`, `REVISAO.md` e as entradas do `DECISOES.md`, a partir das instruções da
-  sessão 3 preparadas no Projeto do claude.ai.
-- O `REVISAO.md` foi escrito pela IA para orientar a revisão; as respostas da banca devem ser
-  confirmadas por cada responsável ao ler o próprio código.
-- Pendente: revisão humana (caixas de verificação do `REVISAO.md` e coluna do README).
+- Claude Code implementou as partes 1 a 5 (motor, dados locais, interface, testes, publicação) a partir
+  do `CLAUDE.md`, do design do Claude Design e das instruções da sessão 4, e gerou as capturas.
+- A interface foi comparada com capturas do protótipo; as divergências estão listadas na resposta da
+  sessão e resumidas abaixo.
+- Pendente: revisão humana (`docs/REVISAO.md` ainda não cobre `web/src/dados/` e a interface).
 
 ## Pendências e bloqueios
-- Base oficial de dados: Organização não fornecerá a base; confirmação formal pendente.
-- Prazo de entrega do repositório: não divulgado.
-- Calibração com o Victor: responder `docs/PERGUNTAS_VICTOR.md` (todos os limites são provisórios).
-- Alerta de tempo de armazenamento de sementes (extra do Victor): não implementado; depende da pergunta 4.
-- Devolução de embalagem: o modelo não registra a devolução; depois do prazo o alerta some (pergunta 5.3).
-- Níveis fixos no código para 8 dos 10 tipos de alerta; passar para a config se o Victor pedir mudanças (pergunta 8).
-- Revisão humana: cada integrante seguir o roteiro do `docs/REVISAO.md`.
-- Provisionamento: conta Neon e conta Cloudflare a cargo do Leonardo (secrets do Codespaces, nunca commitados).
-- Próximas prioridades (CLAUDE.md, seção 9): painel do dono, tela do funcionário, sincronização.
+- Publicar no Cloudflare Pages (Leonardo conecta o repositório) e preencher o link no README.
+- Sincronização com o backend (Hono + Neon): sessão 5.
+- Divergências do design ainda abertas: "Marcar como visto" não implementado; detalhe do alerta no
+  computador abre no lugar da lista (não ao lado); sem estado "Sincronizando".
+- Calibração com o Victor (`docs/PERGUNTAS_VICTOR.md`), incluindo o novo limite de excesso sem consumo.
+- Atualizar `docs/REVISAO.md` com os novos arquivos (dados locais e interface).
+- Base oficial: não será fornecida (confirmação formal pendente). Prazo de entrega: não divulgado.
