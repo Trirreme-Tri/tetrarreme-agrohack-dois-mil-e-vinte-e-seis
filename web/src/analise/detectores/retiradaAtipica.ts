@@ -34,6 +34,7 @@ export const detectarRetiradaAtipica: Detector = ({ analises, hojeDia }) =>
         evidencia: {
           ...evidenciaBase(a),
           data: s.data,
+          movimentacaoId: s.movimentacaoId,
           quantidade: arred(s.quantidade),
           mediana: arred(med),
           mad: arred(mad),

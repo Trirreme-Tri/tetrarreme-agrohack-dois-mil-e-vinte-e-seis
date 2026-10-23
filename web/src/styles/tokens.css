@@ -1,0 +1,106 @@
+/* Monitora — tokens de design (sobre o design system Industry).
+   Escopo: .monitora[data-theme="light"|"dark"]. Nomes em inglês, textos em pt-BR. */
+.monitora {
+  /* Semânticos de gravidade — cor nunca é o único sinal: sempre com ícone + rótulo */
+  --color-critical: #b42318;
+  --color-critical-tint: #fde8e6;
+  --color-critical-solid: #d92d20;
+  --color-warning: #9a5b00;
+  --color-warning-tint: #fdf0c8;
+  --color-warning-solid: #f2b418;
+  --color-info: #1b5fc1;
+  --color-info-tint: #e2ecfb;
+  --color-info-solid: #2f6fdc;
+  --color-ok: #2a6f3a;
+  --color-ok-tint: #e0f2e4;
+  --color-ink-muted: color-mix(in srgb, var(--color-text) 62%, transparent);
+  --color-ink-faint: color-mix(in srgb, var(--color-text) 40%, transparent);
+  --color-primary-ink: #ffffff; /* texto sobre --color-accent */
+  --color-on-critical: #ffffff;
+  --color-on-warning: #1d1f20;
+  --color-on-info: #ffffff;
+  --color-press-edge: #2c455d;   /* borda inferior "tátil" dos botões grandes */
+  --color-edge-neutral: #b7b7ba;
+
+  /* Tipografia (Industry: Barlow Condensed / Barlow) */
+  --fs-base: 16px;           /* dono */
+  --fs-base-worker: 18px;    /* funcionário; "Maior" = 20px */
+  --fs-sm: 0.875em;
+  --fs-lg: 1.25em;
+  --fs-xl: 1.75em;
+  --fs-display: 3em;
+
+  /* Toque e ritmo */
+  --tap-min: 48px;
+  --tap-lg: 64px;
+  --tap-xl: 96px;
+  --gap-1: var(--space-2);
+  --gap-2: var(--space-3);
+  --gap-3: var(--space-4);
+  --gap-4: var(--space-6);
+  --gap-5: var(--space-8);
+
+  /* Raio: Industry é quadrado (0) em objetos blueprint; 4px só em selos */
+  --radius-tag: var(--radius-md);
+  --radius-none: 0;
+
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  color-scheme: light;
+}
+
+.monitora[data-theme="dark"] {
+  --color-bg: #141618;
+  --color-surface: #1e2124;
+  --color-text: #e9eaec;
+  --color-divider: rgba(233, 234, 236, 0.22);
+  --color-accent: #7fa4cb;
+  --color-accent-2: #8fb0d2;
+  --color-accent-100: #1b2838;
+  --color-accent-200: #223548;
+  --color-accent-300: #2d4661;
+  --color-accent-400: #3f5f82;
+  --color-accent-500: #5a7ea4;
+  --color-accent-600: #94b6d9;
+  --color-accent-700: #a7c3df;
+  --color-accent-800: #cbdcee;
+  --color-accent-900: #e6eff8;
+  --color-neutral-100: #1c1f22;
+  --color-neutral-200: #24282c;
+  --color-neutral-300: #32363b;
+  --color-neutral-400: #4b5056;
+  --color-neutral-500: #6d7279;
+  --color-neutral-600: #8e939a;
+  --color-neutral-700: #aeb2b8;
+  --color-neutral-800: #cdd0d4;
+  --color-neutral-900: #e9eaec;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 3px 10px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.65);
+
+  --color-critical: #ff8a80;
+  --color-critical-tint: rgba(255, 138, 128, 0.16);
+  --color-critical-solid: #d92d20;
+  --color-warning: #ffc53d;
+  --color-warning-tint: rgba(255, 197, 61, 0.16);
+  --color-warning-solid: #f2b418;
+  --color-info: #8ab4ff;
+  --color-info-tint: rgba(138, 180, 255, 0.16);
+  --color-info-solid: #2f6fdc;
+  --color-ok: #7fd49a;
+  --color-ok-tint: rgba(127, 212, 154, 0.14);
+  --color-primary-ink: #0f1419;
+  --color-press-edge: #3f5f82;
+  --color-edge-neutral: #4b5056;
+  color-scheme: dark;
+}
+
+/* Industry pinta o texto do botão primário com --color-bg; aqui garantimos contraste nos dois temas */
+.monitora .btn-primary { color: var(--color-primary-ink); }
+.monitora .btn-primary:hover { background: var(--color-accent-600); }
+.monitora .seg-opt:has(input:checked) { color: var(--color-primary-ink); }
+.monitora .input { font-size: inherit; color: var(--color-text); }
+.monitora .input::placeholder { color: var(--color-ink-faint); }
+.monitora button { font-family: inherit; }
+.monitora ::-webkit-scrollbar { display: none; }
