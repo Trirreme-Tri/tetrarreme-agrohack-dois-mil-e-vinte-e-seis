@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/industry-b8602ce5-0bb6-4b06-8390-84252e0b6034/styles.css">
+  <link rel="stylesheet" href="tokens.css">
+  <script src="_ds/industry-b8602ce5-0bb6-4b06-8390-84252e0b6034/_ds_bundle.js"></script>
+  <style>
+    body { margin: 0; background: var(--color-neutral-200); }
+    a { color: var(--color-accent-700); }
+    a:hover { color: var(--color-accent); }
+  </style>
+</helmet>
+<div style="width:2752px; padding:64px; display:flex; flex-direction:column; gap:88px; background:var(--color-neutral-200); color:var(--color-text); font-family:var(--font-body)">
+
+  <section data-screen-label="Capa" style="display:flex; flex-wrap:wrap; align-items:flex-end; gap:24px 64px">
+    <div style="flex:1 1 900px">
+      <div style="font-size:14px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--color-accent-700)">Protótipo navegável · alta fidelidade</div>
+      <h1 style="font-family:var(--font-heading); font-weight:600; font-size:88px; line-height:1; margin:8px 0 12px">Monitora — telas</h1>
+      <p style="margin:0; max-width:900px; font-size:22px; line-height:1.45; text-wrap:pretty">Gestão de insumos do Sítio Bom Futuro (Ariquemes/RO). Celular primeiro; o painel do dono abre também no computador. Cada tela aparece no tema claro, em moldura de celular, e no tema escuro ao lado.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px; font-size:18px">
+      <a href="Monitora App.dc.html" style="font-family:var(--font-heading); font-weight:600; font-size:26px">Abrir o app navegável →</a>
+      <a href="tokens.css">tokens.css (variáveis de design)</a>
+      <span style="display:inline-flex; align-items:center; gap:8px; color:var(--color-ink-muted)">Dados simulados · data de referência 20/10/2026</span>
+    </div>
+  </section>
+
+  <section data-screen-label="1 Painel do dono" style="display:flex; flex-direction:column; gap:32px">
+    <div style="display:flex; align-items:baseline; gap:20px; border-bottom:2px solid var(--color-text); padding-bottom:12px">
+      <span style="font-family:var(--font-heading); font-weight:600; font-size:56px; line-height:1">1</span>
+      <h2 style="font-family:var(--font-heading); font-weight:600; font-size:48px; margin:0">Painel do dono</h2>
+      <span style="font-size:18px; color:var(--color-ink-muted)">Alertas agrupados por nível e, dentro do nível, por tipo. Filtro por categoria. Valor total no topo.</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:64px; align-items:flex-start">
+      <div style="display:flex; gap:24px; align-items:flex-start">
+        <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+          <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Painel · claro</figcaption>
+          <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 380 }}" height="{{ 800 }}" hint-size="380px,800px">
+            <dc-import name="Monitora App" screen="dono-alertas" embedded="1" layout="mobile" theme="claro" conn="sincronizando" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+          </x-import>
+        </figure>
+        <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+          <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Painel · escuro</figcaption>
+          <div style="margin-top:48px; width:364px; height:720px; overflow:hidden; border:1px solid var(--color-divider); box-shadow:var(--shadow-lg)">
+            <dc-import name="Monitora App" screen="dono-alertas" embedded="1" layout="mobile" theme="escuro" conn="online" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+          </div>
+        </figure>
+      </div>
+      <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+        <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Painel vazio · claro</figcaption>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 380 }}" height="{{ 800 }}" hint-size="380px,800px">
+          <dc-import name="Monitora App" screen="dono-alertas" empty="{{ true }}" embedded="1" layout="mobile" theme="claro" conn="online" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+        </x-import>
+      </figure>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:64px; align-items:flex-start">
+      <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+        <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Computador · claro — lista à esquerda, resumo financeiro fixo à direita</figcaption>
+        <div style="width:1280px; height:800px; overflow:hidden; border:1px solid var(--color-divider); box-shadow:var(--shadow-lg)">
+          <dc-import name="Monitora App" screen="dono-alertas" embedded="1" layout="desktop" theme="claro" conn="sincronizando" style="width:1280px; height:800px" hint-size="1280px,800px"></dc-import>
+        </div>
+      </figure>
+      <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+        <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Computador · escuro — detalhe do alerta aberto</figcaption>
+        <div style="width:1280px; height:800px; overflow:hidden; border:1px solid var(--color-divider); box-shadow:var(--shadow-lg)">
+          <dc-import name="Monitora App" screen="dono-alerta" alert-id="a1" embedded="1" layout="desktop" theme="escuro" conn="online" style="width:1280px; height:800px" hint-size="1280px,800px"></dc-import>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section data-screen-label="2 Detalhe do alerta" style="display:flex; flex-direction:column; gap:32px">
+    <div style="display:flex; align-items:baseline; gap:20px; border-bottom:2px solid var(--color-text); padding-bottom:12px">
+      <span style="font-family:var(--font-heading); font-weight:600; font-size:56px; line-height:1">2</span>
+      <h2 style="font-family:var(--font-heading); font-weight:600; font-size:48px; margin:0">Detalhe do alerta</h2>
+      <span style="font-size:18px; color:var(--color-ink-muted)">Frase completa, evidência em números, regra e origem do limite, confiança e recomendação.</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:64px; align-items:flex-start">
+      <div style="display:flex; gap:24px; align-items:flex-start">
+        <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+          <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Estoque crítico (KCl) · claro</figcaption>
+          <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 380 }}" height="{{ 800 }}" hint-size="380px,800px">
+            <dc-import name="Monitora App" screen="dono-alerta" alert-id="a1" embedded="1" layout="mobile" theme="claro" conn="sincronizando" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+          </x-import>
+        </figure>
+        <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+          <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Estoque crítico (KCl) · escuro</figcaption>
+          <div style="margin-top:48px; width:364px; height:720px; overflow:hidden; border:1px solid var(--color-divider); box-shadow:var(--shadow-lg)">
+            <dc-import name="Monitora App" screen="dono-alerta" alert-id="a1" scroll-y="560" embedded="1" layout="mobile" theme="escuro" conn="online" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+          </div>
+        </figure>
+      </div>
+      <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+        <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Histórico insuficiente — sem número de dias</figcaption>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 380 }}" height="{{ 800 }}" hint-size="380px,800px">
+          <dc-import name="Monitora App" screen="dono-alerta" alert-id="a2" embedded="1" layout="mobile" theme="claro" conn="online" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+        </x-import>
+      </figure>
+      <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+        <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Possível duplicidade — confirmar</figcaption>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 380 }}" height="{{ 800 }}" hint-size="380px,800px">
+          <dc-import name="Monitora App" screen="dono-alerta" alert-id="a8" embedded="1" layout="mobile" theme="claro" conn="online" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+        </x-import>
+      </figure>
+    </div>
+  </section>
+
+  <section data-screen-label="3 Registrar retirada" style="display:flex; flex-direction:column; gap:32px">
+    <div style="display:flex; align-items:baseline; gap:20px; border-bottom:2px solid var(--color-text); padding-bottom:12px">
+      <span style="font-family:var(--font-heading); font-weight:600; font-size:56px; line-height:1">3</span>
+      <h2 style="font-family:var(--font-heading); font-weight:600; font-size:48px; margin:0">Registrar retirada (funcionário)</h2>
+      <span style="font-size:18px; color:var(--color-ink-muted)">Perfil → início → produto → quantidade → destino → confirmação. Texto 20 px, alvos de toque de 48 px ou mais.</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:64px; align-items:flex-start">
+      <sc-for list="{{ fluxo }}" as="f" hint-placeholder-count="6">
+        <div style="display:flex; gap:24px; align-items:flex-start">
+          <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+            <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">{{ f.titulo }} · claro</figcaption>
+            <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 380 }}" height="{{ 800 }}" hint-size="380px,800px">
+              <dc-import name="Monitora App" screen="{{ f.screen }}" produto-id="{{ f.produtoId }}" qtd="{{ f.qtd }}" unidade="{{ f.unidade }}" destino="{{ f.destino }}" modo="{{ f.modo }}" embedded="1" layout="mobile" theme="claro" conn="{{ f.conn }}" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+            </x-import>
+          </figure>
+          <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+            <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">{{ f.titulo }} · escuro</figcaption>
+            <div style="margin-top:48px; width:364px; height:720px; overflow:hidden; border:1px solid var(--color-divider); box-shadow:var(--shadow-lg)">
+              <dc-import name="Monitora App" screen="{{ f.screen }}" produto-id="{{ f.produtoId }}" qtd="{{ f.qtd }}" unidade="{{ f.unidade }}" destino="{{ f.destino }}" modo="{{ f.modo }}" embedded="1" layout="mobile" theme="escuro" conn="{{ f.connDark }}" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+            </div>
+          </figure>
+        </div>
+      </sc-for>
+      <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+        <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Registrar entrada · lote e validade</figcaption>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 380 }}" height="{{ 800 }}" hint-size="380px,800px">
+          <dc-import name="Monitora App" screen="func-lote" modo="entrada" produto-id="kcl" qtd="3000" unidade="kg" embedded="1" layout="mobile" theme="claro" conn="sem internet" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+        </x-import>
+      </figure>
+    </div>
+  </section>
+
+  <section data-screen-label="4 Detalhe do produto" style="display:flex; flex-direction:column; gap:32px">
+    <div style="display:flex; align-items:baseline; gap:20px; border-bottom:2px solid var(--color-text); padding-bottom:12px">
+      <span style="font-family:var(--font-heading); font-weight:600; font-size:56px; line-height:1">4</span>
+      <h2 style="font-family:var(--font-heading); font-weight:600; font-size:48px; margin:0">Detalhe do produto</h2>
+      <span style="font-size:18px; color:var(--color-ink-muted)">Saldo por lote com validade, linha do saldo com entradas marcadas (90 dias / 12 meses), movimentações com a retirada atípica destacada.</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:64px; align-items:flex-start">
+      <div style="display:flex; gap:24px; align-items:flex-start">
+        <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+          <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Inseticida lambda-cialotrina · claro</figcaption>
+          <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 380 }}" height="{{ 800 }}" hint-size="380px,800px">
+            <dc-import name="Monitora App" screen="dono-produto" produto-id="lambda" embedded="1" layout="mobile" theme="claro" conn="online" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+          </x-import>
+        </figure>
+        <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+          <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Inseticida lambda-cialotrina · escuro</figcaption>
+          <div style="margin-top:48px; width:364px; height:720px; overflow:hidden; border:1px solid var(--color-divider); box-shadow:var(--shadow-lg)">
+            <dc-import name="Monitora App" screen="dono-produto" produto-id="lambda" embedded="1" layout="mobile" theme="escuro" conn="online" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+          </div>
+        </figure>
+      </div>
+      <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+        <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Lotes e movimentações (rolado)</figcaption>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 380 }}" height="{{ 800 }}" hint-size="380px,800px">
+          <dc-import name="Monitora App" screen="dono-produto" produto-id="lambda" scroll-y="880" embedded="1" layout="mobile" theme="claro" conn="online" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+        </x-import>
+      </figure>
+      <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+        <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Inoculante — lote vencido, 12 meses</figcaption>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 380 }}" height="{{ 800 }}" hint-size="380px,800px">
+          <dc-import name="Monitora App" screen="dono-produto" produto-id="inoculante" periodo="365" scroll-y="360" embedded="1" layout="mobile" theme="claro" conn="online" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+        </x-import>
+      </figure>
+      <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+        <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Lista de produtos — com alerta primeiro</figcaption>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 380 }}" height="{{ 800 }}" hint-size="380px,800px">
+          <dc-import name="Monitora App" screen="dono-produtos" embedded="1" layout="mobile" theme="claro" conn="online" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+        </x-import>
+      </figure>
+    </div>
+  </section>
+
+  <section data-screen-label="5 Resumo financeiro" style="display:flex; flex-direction:column; gap:32px">
+    <div style="display:flex; align-items:baseline; gap:20px; border-bottom:2px solid var(--color-text); padding-bottom:12px">
+      <span style="font-family:var(--font-heading); font-weight:600; font-size:56px; line-height:1">5</span>
+      <h2 style="font-family:var(--font-heading); font-weight:600; font-size:48px; margin:0">Resumo financeiro</h2>
+      <span style="font-size:18px; color:var(--color-ink-muted)">Mapa de blocos por categoria, itens parados e contagem de itens sem preço. Nunca R$ 0,00 para preço desconhecido.</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:64px; align-items:flex-start">
+      <div style="display:flex; gap:24px; align-items:flex-start">
+        <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+          <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Financeiro · claro</figcaption>
+          <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 380 }}" height="{{ 800 }}" hint-size="380px,800px">
+            <dc-import name="Monitora App" screen="dono-financeiro" embedded="1" layout="mobile" theme="claro" conn="online" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+          </x-import>
+        </figure>
+        <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+          <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Financeiro · escuro</figcaption>
+          <div style="margin-top:48px; width:364px; height:720px; overflow:hidden; border:1px solid var(--color-divider); box-shadow:var(--shadow-lg)">
+            <dc-import name="Monitora App" screen="dono-financeiro" scroll-y="620" embedded="1" layout="mobile" theme="escuro" conn="online" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+          </div>
+        </figure>
+      </div>
+      <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+        <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:20px; margin:0; color:var(--color-text)">Financeiro · computador</figcaption>
+        <div style="width:1280px; height:800px; overflow:hidden; border:1px solid var(--color-divider); box-shadow:var(--shadow-lg)">
+          <dc-import name="Monitora App" screen="dono-financeiro" embedded="1" layout="desktop" theme="claro" conn="online" style="width:1280px; height:800px" hint-size="1280px,800px"></dc-import>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section data-screen-label="6 Componentes" style="display:flex; flex-direction:column; gap:32px">
+    <div style="display:flex; align-items:baseline; gap:20px; border-bottom:2px solid var(--color-text); padding-bottom:12px">
+      <span style="font-family:var(--font-heading); font-weight:600; font-size:56px; line-height:1">6</span>
+      <h2 style="font-family:var(--font-heading); font-weight:600; font-size:48px; margin:0">Componentes reutilizados</h2>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:48px; align-items:flex-start">
+      <div style="width:560px; height:1960px; overflow:hidden; border:1px solid var(--color-divider); box-shadow:var(--shadow-md)">
+        <dc-import name="Monitora App" screen="componentes" embedded="1" layout="mobile" theme="claro" conn="online" style="width:560px; height:1960px" hint-size="560px,1960px"></dc-import>
+      </div>
+      <div style="width:560px; height:1960px; overflow:hidden; border:1px solid var(--color-divider); box-shadow:var(--shadow-md)">
+        <dc-import name="Monitora App" screen="componentes" embedded="1" layout="mobile" theme="escuro" conn="online" style="width:560px; height:1960px" hint-size="560px,1960px"></dc-import>
+      </div>
+      <div style="flex:1 1 700px; max-width:1200px; display:flex; flex-direction:column">
+        <sc-for list="{{ componentes }}" as="c" hint-placeholder-count="6">
+          <div style="display:grid; grid-template-columns:280px minmax(0,1fr); gap:24px; padding:20px 0; border-top:1px solid var(--color-divider)">
+            <span style="font-family:var(--font-heading); font-weight:600; font-size:26px; line-height:1.1">{{ c.nome }}</span>
+            <span style="display:flex; flex-direction:column; gap:6px; font-size:18px; line-height:1.45">
+              <span>{{ c.oque }}</span>
+              <span style="color:var(--color-ink-muted)">Usado em: {{ c.onde }}</span>
+            </span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="7 Tokens" style="display:flex; flex-direction:column; gap:32px">
+    <div style="display:flex; align-items:baseline; gap:20px; border-bottom:2px solid var(--color-text); padding-bottom:12px">
+      <span style="font-family:var(--font-heading); font-weight:600; font-size:56px; line-height:1">7</span>
+      <h2 style="font-family:var(--font-heading); font-weight:600; font-size:48px; margin:0">Tokens de design</h2>
+      <span style="font-size:18px; color:var(--color-ink-muted)">Variáveis CSS em <a href="tokens.css">tokens.css</a>, sobre o design system Industry. Escopo: <code>.monitora[data-theme="light|dark"]</code>.</span>
+    </div>
+    <div style="display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:64px; align-items:start">
+      <div>
+        <div style="display:grid; grid-template-columns:96px 96px 340px minmax(0,1fr); gap:16px; padding:0 0 10px; font-size:14px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-ink-muted)">
+          <span>Claro</span><span>Escuro</span><span>Variável</span><span>Uso</span>
+        </div>
+        <sc-for list="{{ cores }}" as="t" hint-placeholder-count="8">
+          <div style="display:grid; grid-template-columns:96px 96px 340px minmax(0,1fr); gap:16px; align-items:center; padding:8px 0; border-top:1px solid var(--color-divider)">
+            <span class="monitora" data-theme="light" style="display:block; height:40px; background:transparent; border:1px solid var(--color-divider)"><span style="display:block; height:100%; background:{{ t.css }}"></span></span>
+            <span class="monitora" data-theme="dark" style="display:block; height:40px; background:transparent; border:1px solid var(--color-divider)"><span style="display:block; height:100%; background:{{ t.css }}"></span></span>
+            <code style="font-size:17px">{{ t.nome }}</code>
+            <span style="font-size:17px">{{ t.uso }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:40px">
+        <div>
+          <h3 style="font-family:var(--font-heading); font-weight:600; font-size:30px; margin:0 0 12px">Tipografia</h3>
+          <div style="padding:12px 0; border-top:1px solid var(--color-divider)"><span style="font-family:var(--font-heading); font-weight:600; font-size:44px; line-height:1">Barlow Condensed 600</span><div style="font-size:16px; color:var(--color-ink-muted)"><code>--font-heading</code> · títulos, números, rótulos de botão</div></div>
+          <div style="padding:12px 0; border-top:1px solid var(--color-divider)"><span style="font-size:28px">Barlow 400 / 500 / 700</span><div style="font-size:16px; color:var(--color-ink-muted)"><code>--font-body</code> · textos e valores de tabela</div></div>
+          <sc-for list="{{ tipos }}" as="t" hint-placeholder-count="4">
+            <div style="display:flex; justify-content:space-between; gap:16px; padding:10px 0; border-top:1px solid var(--color-divider); font-size:17px"><code>{{ t.nome }}</code><span>{{ t.valor }}</span></div>
+          </sc-for>
+        </div>
+        <div>
+          <h3 style="font-family:var(--font-heading); font-weight:600; font-size:30px; margin:0 0 12px">Espaçamento, toque e raio</h3>
+          <sc-for list="{{ espacos }}" as="t" hint-placeholder-count="6">
+            <div style="display:grid; grid-template-columns:200px 120px minmax(0,1fr); gap:16px; align-items:center; padding:10px 0; border-top:1px solid var(--color-divider); font-size:17px">
+              <code>{{ t.nome }}</code>
+              <span>{{ t.valor }}</span>
+              <span style="display:block; height:12px; width:{{ t.w }}; background:var(--color-accent)"></span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="8 Notas" style="display:flex; flex-direction:column; gap:24px; max-width:1400px">
+    <div style="display:flex; align-items:baseline; gap:20px; border-bottom:2px solid var(--color-text); padding-bottom:12px">
+      <span style="font-family:var(--font-heading); font-weight:600; font-size:56px; line-height:1">8</span>
+      <h2 style="font-family:var(--font-heading); font-weight:600; font-size:48px; margin:0">Notas e pontos em aberto</h2>
+    </div>
+    <sc-for list="{{ notas }}" as="n" hint-placeholder-count="5">
+      <div style="display:grid; grid-template-columns:56px minmax(0,1fr); gap:16px; padding:14px 0; border-top:1px solid var(--color-divider); font-size:20px; line-height:1.45">
+        <span style="font-family:var(--font-heading); font-weight:600; color:var(--color-accent-700)">{{ n.n }}</span>
+        <span style="text-wrap:pretty">{{ n.t }}</span>
+      </div>
+    </sc-for>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const fluxo = [
+      { titulo: '00 Escolher perfil', screen: 'perfil', conn: 'sincronizando', connDark: 'online' },
+      { titulo: '01 Início do funcionário', screen: 'func-inicio', conn: 'sem internet', connDark: 'online' },
+      { titulo: '02 Escolher produto', screen: 'func-produto', conn: 'sem internet', connDark: 'sincronizando' },
+      { titulo: '03 Quantidade', screen: 'func-quantidade', produtoId: 'lambda', qtd: '200', unidade: 'mL', conn: 'sem internet', connDark: 'sem internet' },
+      { titulo: '04 Destino', screen: 'func-destino', produtoId: 'lambda', qtd: '200', unidade: 'mL', destino: 'Horta', conn: 'sem internet', connDark: 'sem internet' },
+      { titulo: '05 Registrado', screen: 'func-ok', produtoId: 'lambda', qtd: '200', unidade: 'mL', destino: 'Horta', conn: 'sem internet', connDark: 'online' },
+    ].map((f) => Object.assign({ produtoId: '', qtd: '', unidade: '', destino: '', modo: 'retirada' }, f));
+    const cores = [
+      ['--color-bg', 'Fundo da tela'], ['--color-surface', 'Teclas e campos'], ['--color-text', 'Texto principal'],
+      ['--color-accent', 'Botão principal, item ativo'], ['--color-accent-700', 'Ícones, rótulos e links'], ['--color-press-edge', 'Borda inferior “tátil” do botão grande'],
+      ['--color-divider', 'Linhas e contornos'], ['--color-edge-neutral', 'Borda tátil de teclas e botão secundário'],
+      ['--color-critical-solid', 'Selo Crítico (fundo)'], ['--color-critical', 'Texto e ícone Crítico'], ['--color-critical-tint', 'Fundo suave Crítico'],
+      ['--color-warning-solid', 'Selo Atenção (fundo)'], ['--color-warning', 'Texto Atenção, “Sem internet”'], ['--color-warning-tint', 'Fundo de “Sem internet” e retirada atípica'],
+      ['--color-info-solid', 'Selo Informativo (fundo)'], ['--color-info', 'Texto Informativo, “Sincronizando”'], ['--color-info-tint', 'Fundo de “Sincronizando”'],
+      ['--color-ok', 'Texto “Online”, confirmação'], ['--color-ok-tint', 'Fundo de “Online”, painel vazio'],
+    ].map((c) => ({ nome: c[0], css: 'var(' + c[0] + ')', uso: c[1] }));
+    const tipos = [
+      { nome: '--fs-base (dono)', valor: '16 px · 17 px no modo “maior”' },
+      { nome: '--fs-base-worker', valor: '18 px · 20 px no modo “maior” (padrão)' },
+      { nome: 'Título de tela', valor: '1,9–2,1 em · Barlow Condensed' },
+      { nome: 'Número do teclado', valor: '2,8 em · algarismos tabulares' },
+    ];
+    const espacos = [
+      { nome: '--space-2', valor: '6,8 px', w: '7px' }, { nome: '--space-3', valor: '10,2 px', w: '10px' }, { nome: '--space-4', valor: '13,6 px', w: '14px' },
+      { nome: '--space-6', valor: '20,4 px', w: '20px' }, { nome: '--space-8', valor: '27,2 px', w: '27px' },
+      { nome: '--tap-min', valor: '48 px', w: '48px' }, { nome: '--tap-lg', valor: '64 px', w: '64px' }, { nome: '--tap-xl', valor: '96 px', w: '96px' },
+      { nome: '--radius-none', valor: '0 · objetos blueprint', w: '2px' },
+    ];
+    const componentes = [
+      { nome: 'Cartão de alerta', oque: 'Selo de nível + tipo com ícone, produto, frase curta, selo de confiança e valor envolvido (ou “Sem preço” / “Não se aplica”). Moldura blueprint com marcas de canto.', onde: 'Painel do dono, componentes' },
+      { nome: 'Selo de nível', oque: 'Crítico, Atenção, Informativo: cor plena + ícone próprio (octógono, triângulo, círculo) + rótulo em maiúsculas. A cor nunca aparece sozinha.', onde: 'Cartão de alerta, cabeçalho de grupo, detalhe do alerta, lista de produtos, lotes' },
+      { nome: 'Selo de confiança', oque: 'Três barras (alta 3, média 2, baixa 1), barras tracejadas para histórico insuficiente e um ✓ para fato registrado, sempre com texto.', onde: 'Cartão de alerta, detalhe do alerta, detalhe do produto' },
+      { nome: 'Indicador de conexão', oque: 'Online, “Sem internet — N registros aguardando envio” (conta os novos registros) e Sincronizando com ícone girando. Fica no cabeçalho de todas as telas.', onde: 'Cabeçalho' },
+      { nome: 'Botão grande', oque: 'Alvo de 96–112 px, ícone de 44–48 px, título e frase de apoio. Borda inferior “tátil” que afunda ao tocar.', onde: 'Perfil, início do funcionário, confirmação' },
+      { nome: 'Teclado numérico', oque: 'Doze teclas de 58 px (vírgula e Apagar com ícone + texto), seletor de unidade (mL/L, g/kg, kg/t) e aviso quando a quantidade passa do saldo.', onde: 'Informar quantidade' },
+    ];
+    const notas = [
+      'Nenhum login com e-mail: o perfil é escolhido na primeira tela e pode ser trocado no topo. Como guardar essa escolha no aparelho ainda precisa ser definido.',
+      'Registrar entrada pede quantidade, lote e validade — o brief não lista preço. Por isso itens recebidos continuam como “Sem preço” até alguém informar o valor.',
+      '“Marcar como visto” e a resposta de duplicidade valem só na sessão (R6/R8). Onde essas respostas ficam salvas está em aberto.',
+      'Os destinos (Talhão 1–3, Horta, Pomar, Oficina, Galpão, Irrigação) e os funcionários A–D são fictícios; precisam vir do cadastro da propriedade.',
+      'Produtos sem movimentações no motor recebem um histórico gerado a partir do consumo simulado, só para preencher a tela.',
+      'Vibração ou som ao confirmar um registro não foi definido.',
+      'A linha tracejada de estoque mínimo no gráfico só aparece quando o produto tem mínimo cadastrado.',
+    ].map((t, i) => ({ n: String(i + 1).padStart(2, '0'), t }));
+    return { fluxo, cores, tipos, espacos, componentes, notas };
+  }
+}
+</script>
+</body>
+</html>

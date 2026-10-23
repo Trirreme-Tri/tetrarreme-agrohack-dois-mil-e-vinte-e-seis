@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/industry-b8602ce5-0bb6-4b06-8390-84252e0b6034/styles.css">
+  <link rel="stylesheet" href="tokens.css">
+  <script src="_ds/industry-b8602ce5-0bb6-4b06-8390-84252e0b6034/_ds_bundle.js"></script>
+  <style>
+    body { margin: 0; background: var(--color-neutral-200); }
+    a { color: var(--color-accent-700); }
+    a:hover { color: var(--color-accent); }
+  </style>
+</helmet>
+<div style="width:2960px; padding:64px; display:flex; flex-direction:column; gap:72px; background:var(--color-neutral-200); color:var(--color-text); font-family:var(--font-body)">
+
+  <section data-screen-label="Capa" style="display:flex; align-items:flex-end; gap:48px">
+    <div style="flex:1">
+      <h1 style="font-family:var(--font-heading); font-weight:600; font-size:80px; line-height:1; margin:0 0 10px">Monitora</h1>
+      <p style="margin:0; font-size:22px">Gestão de insumos · Sítio Bom Futuro, Ariquemes/RO · dados simulados de 20/10/2026</p>
+    </div>
+    <div style="display:flex; gap:32px; font-size:20px">
+      <a href="Monitora App.dc.html" style="font-family:var(--font-heading); font-weight:600; font-size:26px">Abrir o app navegável →</a>
+      <a href="tokens.css" style="align-self:center">tokens.css</a>
+    </div>
+  </section>
+
+  <section data-screen-label="Telas" style="display:flex; flex-direction:column; gap:24px">
+    <h2 style="font-family:var(--font-heading); font-weight:600; font-size:40px; margin:0; padding-bottom:10px; border-bottom:2px solid var(--color-text)">Telas principais</h2>
+    <div style="display:flex; gap:40px; align-items:flex-start">
+      <sc-for list="{{ telas }}" as="t" hint-placeholder-count="7">
+        <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+          <figcaption style="display:flex; gap:10px; align-items:baseline; font-family:var(--font-heading); font-weight:600; font-size:22px">
+            <span style="color:var(--color-accent-700)">{{ t.n }}</span><span>{{ t.titulo }}</span>
+          </figcaption>
+          <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ 380 }}" height="{{ 800 }}" hint-size="380px,800px">
+            <dc-import name="Monitora App" screen="{{ t.screen }}" alert-id="{{ t.alertId }}" produto-id="{{ t.produtoId }}" qtd="{{ t.qtd }}" unidade="{{ t.unidade }}" destino="{{ t.destino }}" embedded="1" layout="mobile" theme="claro" conn="{{ t.conn }}" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+          </x-import>
+        </figure>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="Estados e tema escuro" style="display:flex; flex-direction:column; gap:24px">
+    <h2 style="font-family:var(--font-heading); font-weight:600; font-size:40px; margin:0; padding-bottom:10px; border-bottom:2px solid var(--color-text)">Estados e tema escuro</h2>
+    <div style="display:flex; gap:40px; align-items:flex-start">
+      <sc-for list="{{ estados }}" as="t" hint-placeholder-count="5">
+        <figure style="margin:0; display:flex; flex-direction:column; gap:12px">
+          <figcaption style="font-family:var(--font-heading); font-weight:600; font-size:22px">{{ t.titulo }}</figcaption>
+          <div style="width:364px; height:720px; overflow:hidden; border:1px solid var(--color-divider); box-shadow:var(--shadow-lg)">
+            <dc-import name="Monitora App" screen="{{ t.screen }}" alert-id="{{ t.alertId }}" produto-id="{{ t.produtoId }}" qtd="{{ t.qtd }}" unidade="{{ t.unidade }}" empty="{{ t.empty }}" embedded="1" layout="mobile" theme="{{ t.theme }}" conn="{{ t.conn }}" style="width:364px; height:720px" hint-size="364px,720px"></dc-import>
+          </div>
+        </figure>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="Computador" style="display:flex; flex-direction:column; gap:24px">
+    <h2 style="font-family:var(--font-heading); font-weight:600; font-size:40px; margin:0; padding-bottom:10px; border-bottom:2px solid var(--color-text)">Painel do dono no computador</h2>
+    <div style="width:1280px; height:800px; overflow:hidden; border:1px solid var(--color-divider); box-shadow:var(--shadow-lg)">
+      <dc-import name="Monitora App" screen="dono-alertas" embedded="1" layout="desktop" theme="claro" conn="online" style="width:1280px; height:800px" hint-size="1280px,800px"></dc-import>
+    </div>
+  </section>
+
+  <section data-screen-label="Componentes e tokens" style="display:flex; flex-direction:column; gap:24px">
+    <h2 style="font-family:var(--font-heading); font-weight:600; font-size:40px; margin:0; padding-bottom:10px; border-bottom:2px solid var(--color-text)">Componentes e tokens</h2>
+    <div style="display:flex; gap:64px; align-items:flex-start">
+      <div style="flex:none; width:560px; height:1960px; overflow:hidden; border:1px solid var(--color-divider); box-shadow:var(--shadow-md)">
+        <dc-import name="Monitora App" screen="componentes" embedded="1" layout="mobile" theme="claro" conn="online" style="width:560px; height:1960px" hint-size="560px,1960px"></dc-import>
+      </div>
+      <div style="flex:1; max-width:900px; display:flex; flex-direction:column; gap:40px">
+        <div>
+          <sc-for list="{{ componentes }}" as="c" hint-placeholder-count="6">
+            <div style="display:grid; grid-template-columns:240px minmax(0,1fr); gap:20px; padding:16px 0; border-top:1px solid var(--color-divider); font-size:18px; line-height:1.45">
+              <span style="font-family:var(--font-heading); font-weight:600; font-size:24px; line-height:1.1">{{ c.nome }}</span>
+              <span>{{ c.oque }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div>
+          <sc-for list="{{ cores }}" as="t" hint-placeholder-count="8">
+            <div style="display:grid; grid-template-columns:64px 64px 300px minmax(0,1fr); gap:16px; align-items:center; padding:6px 0; border-top:1px solid var(--color-divider)">
+              <span class="monitora" data-theme="light" style="display:block; height:32px; border:1px solid var(--color-divider)"><span style="display:block; height:100%; background:{{ t.css }}"></span></span>
+              <span class="monitora" data-theme="dark" style="display:block; height:32px; border:1px solid var(--color-divider)"><span style="display:block; height:100%; background:{{ t.css }}"></span></span>
+              <code style="font-size:16px">{{ t.nome }}</code>
+              <span style="font-size:16px">{{ t.uso }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="Notas" style="display:flex; flex-direction:column; gap:12px; max-width:1300px">
+    <h2 style="font-family:var(--font-heading); font-weight:600; font-size:40px; margin:0; padding-bottom:10px; border-bottom:2px solid var(--color-text)">Em aberto</h2>
+    <sc-for list="{{ notas }}" as="n" hint-placeholder-count="4">
+      <p style="margin:0; padding:10px 0; border-bottom:1px solid var(--color-divider); font-size:20px; line-height:1.45; text-wrap:pretty">{{ n }}</p>
+    </sc-for>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const base = { alertId: '', produtoId: '', qtd: '', unidade: '', destino: '', empty: false, conn: 'online' };
+    const telas = [
+      { n: '1', titulo: 'Painel do dono', screen: 'dono-alertas', conn: 'sincronizando' },
+      { n: '2', titulo: 'Detalhe do alerta', screen: 'dono-alerta', alertId: 'a1' },
+      { n: '3a', titulo: 'Escolher produto', screen: 'func-produto', conn: 'sem internet' },
+      { n: '3b', titulo: 'Quantidade', screen: 'func-quantidade', produtoId: 'lambda', qtd: '200', unidade: 'mL', conn: 'sem internet' },
+      { n: '3c', titulo: 'Registrado', screen: 'func-ok', produtoId: 'lambda', qtd: '200', unidade: 'mL', destino: 'Horta', conn: 'sem internet' },
+      { n: '4', titulo: 'Detalhe do produto', screen: 'dono-produto', produtoId: 'lambda' },
+      { n: '5', titulo: 'Resumo financeiro', screen: 'dono-financeiro' },
+    ].map((t) => Object.assign({}, base, t));
+    const estados = [
+      { titulo: 'Painel vazio', screen: 'dono-alertas', empty: true, theme: 'claro' },
+      { titulo: 'Histórico insuficiente', screen: 'dono-alerta', alertId: 'a2', theme: 'claro' },
+      { titulo: 'Início do funcionário · escuro', screen: 'func-inicio', theme: 'escuro', conn: 'sem internet' },
+      { titulo: 'Painel · escuro', screen: 'dono-alertas', theme: 'escuro' },
+      { titulo: 'Quantidade · escuro', screen: 'func-quantidade', produtoId: 'lambda', qtd: '200', unidade: 'mL', theme: 'escuro', conn: 'sincronizando' },
+    ].map((t) => Object.assign({}, base, t));
+    const componentes = [
+      { nome: 'Cartão de alerta', oque: 'Nível, tipo, produto, frase curta, confiança e valor (ou “Sem preço”).' },
+      { nome: 'Selo de nível', oque: 'Crítico, Atenção, Informativo: cor + ícone + rótulo.' },
+      { nome: 'Selo de confiança', oque: 'Barras de alta a insuficiente, sempre com texto.' },
+      { nome: 'Indicador de conexão', oque: 'Online, Sem internet (com registros aguardando) e Sincronizando.' },
+      { nome: 'Botão grande', oque: 'Ícone, título e frase de apoio; borda inferior que afunda ao tocar.' },
+      { nome: 'Teclado numérico', oque: 'Teclas de 58 px, seletor de unidade e aviso de saldo.' },
+    ];
+    const cores = [
+      ['--color-bg', 'Fundo'], ['--color-text', 'Texto'], ['--color-accent', 'Botão principal'], ['--color-accent-700', 'Ícones e links'],
+      ['--color-critical-solid', 'Crítico'], ['--color-warning-solid', 'Atenção'], ['--color-info-solid', 'Informativo'], ['--color-ok', 'Online e confirmação'],
+    ].map((c) => ({ nome: c[0], css: 'var(' + c[0] + ')', uso: c[1] }));
+    const notas = [
+      'Perfil escolhido na primeira tela, sem login. Como guardar a escolha no aparelho está em aberto.',
+      'A entrada não pede preço (o brief não lista); itens recebidos seguem “Sem preço” até alguém informar.',
+      '“Marcar como visto” e a resposta de duplicidade valem só na sessão (R6/R8).',
+      'Destinos e funcionários A–D são fictícios; devem vir do cadastro da propriedade.',
+    ];
+    return { telas, estados, componentes, cores, notas };
+  }
+}
+</script>
+</body>
+</html>
