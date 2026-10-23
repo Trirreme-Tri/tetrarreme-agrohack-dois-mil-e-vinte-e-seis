@@ -13,10 +13,9 @@ import { writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-/** Data de referência da análise: a base termina aqui e os testes analisam nesta data. */
-export const DATA_REFERENCIA = '2026-10-20'
-/** Primeiro dia da base (12 meses antes da data de referência). */
-export const INICIO = '2025-10-21'
+import { DATA_REFERENCIA, INICIO } from './referencia.ts'
+
+export { DATA_REFERENCIA, INICIO }
 const SEMENTE = 20261029
 
 export type NivelAlerta = 'critico' | 'atencao' | 'informativo'

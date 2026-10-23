@@ -10,6 +10,8 @@ export interface ContextoDeteccao {
   hojeDia: number
   /** Limites que não variam por produto. Os demais vêm resolvidos em `AnaliseProduto.limites`. */
   globais: LimitesGlobais
+  /** Pares (chave de `chavePar`) que uma pessoa já disse serem produtos diferentes. */
+  paresDiferentes: ReadonlySet<string>
 }
 
 export type Detector = (ctx: ContextoDeteccao) => AlertaSemMensagem[]

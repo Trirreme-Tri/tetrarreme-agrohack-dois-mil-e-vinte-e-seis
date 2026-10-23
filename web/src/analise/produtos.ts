@@ -1,6 +1,7 @@
 // R8: produto canônico + apelidos. A unificação é sugerida, nunca automática,
 // e nunca acontece quando os números do nome diferem (NPK 04-14-08 ≠ NPK 04-30-16).
-import type { Produto, ProdutoAlias } from '@tetrarreme/contrato'
+import type { Movimentacao, Produto, ProdutoAlias } from '@tetrarreme/contrato'
+import { obterUnidade } from './unidades.ts'
 
 const PALAVRAS_IGNORADAS = new Set(['de', 'da', 'do', 'das', 'dos', 'para', 'com', 'e', 'em'])
 
@@ -165,4 +166,38 @@ export function confirmarAlias(nomeOriginal: string, produto: Produto): ProdutoA
     )
   }
   return { nome_original: nomeOriginal, produto_id: produto.id, confirmado: true }
+}
+
+/** Chave de um par de produtos, independente da ordem. */
+export function chavePar(a: string, b: string): string {
+  return a < b ? `${a}|${b}` : `${b}|${a}`
+}
+
+/**
+ * Aplica as unificações confirmadas por uma pessoa (R8): se o nome canônico de um produto B é
+ * apelido confirmado de outro produto A, as movimentações de B passam a contar em A e B sai da lista.
+ * Não altera nenhum registro (append-only): só a visão usada na análise. Recusa juntar produtos de
+ * dimensões diferentes (R1) ou com números diferentes.
+ */
+export function aplicarUnificacoes(
+  produtos: readonly Produto[],
+  movimentacoes: readonly Movimentacao[],
+  aliases: readonly ProdutoAlias[],
+): { produtos: Produto[]; movimentacoes: Movimentacao[] } {
+  const porId = new Map(produtos.map((p) => [p.id, p]))
+  const destino = new Map<string, string>()
+  for (const alias of aliases) {
+    if (!alias.confirmado) continue
+    const alvo = porId.get(alias.produto_id)
+    const origem = produtos.find((p) => p.id !== alias.produto_id && normalizarNome(p.nome_canonico) === normalizarNome(alias.nome_original))
+    if (!alvo || !origem) continue
+    if (obterUnidade(origem.unidade_base_id).dimensao !== obterUnidade(alvo.unidade_base_id).dimensao) continue
+    if (!numerosCompativeis(origem.nome_canonico, alvo.nome_canonico)) continue
+    destino.set(origem.id, alvo.id)
+  }
+  if (destino.size === 0) return { produtos: [...produtos], movimentacoes: [...movimentacoes] }
+  return {
+    produtos: produtos.filter((p) => !destino.has(p.id)),
+    movimentacoes: movimentacoes.map((m) => (destino.has(m.produto_id) ? { ...m, produto_id: destino.get(m.produto_id)! } : m)),
+  }
 }

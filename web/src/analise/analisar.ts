@@ -9,12 +9,15 @@ import { DETECTORES } from './detectores/index.ts'
 import { resumirFinanceiro } from './financeiro.ts'
 import type { ResumoFinanceiro } from './financeiro.ts'
 import { comMensagem } from './mensagens.ts'
+import { chavePar } from './produtos.ts'
 import type { Alerta, Importacao, Movimentacao, NivelAlerta, Origem, Produto } from '@tetrarreme/contrato'
 
 export interface OpcoesAnalise {
   config?: ConfigAnalise
   /** Se informadas, o resultado diz de que origem vieram os dados (R7). */
   importacoes?: readonly Importacao[]
+  /** Pares de produtos que uma pessoa já disse serem diferentes: não geram mais possível duplicidade (R8). */
+  paresDiferentes?: readonly (readonly [string, string])[]
 }
 
 /** Problema na configuração de limites. Não é alerta de estoque: é para quem mantém a config. */
@@ -115,7 +118,8 @@ export function analisar(
 
   const analises = produtos.map((p) => analisarProduto(p, porProduto.get(p.id)!, hojeDia, limitesPara(p, config)))
   // Os detectores não leem a configuração: recebem os limites já resolvidos por produto e os globais.
-  const ctx = { analises, hojeDia, globais: config.globais }
+  const paresDiferentes = new Set((opcoes.paresDiferentes ?? []).map(([a, b]) => chavePar(a, b)))
+  const ctx = { analises, hojeDia, globais: config.globais, paresDiferentes }
   const alertas = DETECTORES.flatMap((detectar) => detectar(ctx)).map(comMensagem)
 
   let origens: Origem[] = []

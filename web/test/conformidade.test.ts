@@ -287,6 +287,15 @@ describe('R6 — atualização gera reanálise', () => {
     expect(analisar(movs, produtos, HOJE_SIMULADO)).toEqual(analisar(movs, produtos, HOJE_SIMULADO))
   })
 
+  test('R6: o resultado não depende da ordem das movimentações nem da ordem dos produtos', () => {
+    const embaralhar = <T,>(xs: readonly T[]) => xs.map((x, i) => [(i * 7919) % 104729, x] as const).sort((p, q) => p[0] - q[0]).map(([, x]) => x)
+    const r = analisar(embaralhar(base.movimentacoes), [...base.produtosNovos].reverse(), HOJE_SIMULADO)
+    const resumo = (x: ReturnType<typeof analisar>) => x.alertas.map((a) => `${a.produtoId}|${a.tipo}|${a.nivel}|${a.valorEnvolvido}`).sort()
+    expect(resumo(r)).toEqual(resumo(resultadoBase))
+    expect(r.avisosDados).toEqual([])
+    expect(r.resumoFinanceiro.valorConhecido).toBe(resultadoBase.resumoFinanceiro.valorConhecido)
+  })
+
   test('R6: a data de referência é parâmetro; movimentações futuras são ignoradas', () => {
     const p = produto({ id: 'x' })
     const movs = [

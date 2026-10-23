@@ -22,6 +22,7 @@
   },
   "include": [
     "test",
-    "../data/simulados/gerar.ts"
+    "../data/simulados/gerar.ts",
+    "../data/simulados/referencia.ts"
   ]
 }

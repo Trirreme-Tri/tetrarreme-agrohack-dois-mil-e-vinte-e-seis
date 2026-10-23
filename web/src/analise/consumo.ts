@@ -102,10 +102,23 @@ function ordemFefo(a: SaldoLote, b: SaldoLote): number {
 }
 
 /** Movimentações do produto até `hojeDia`, em ordem cronológica. */
+const ORDEM_NO_DIA = { entrada: 0, ajuste: 1, saida: 2 } as const
+
+/**
+ * Movimentações até `hojeDia`, em ordem cronológica. No mesmo dia: entradas, ajustes e depois
+ * retiradas (a data não tem hora; o que chegou no dia está disponível para sair no dia), e então
+ * pela hora do registro. Não depende da ordem em que o banco devolve os registros.
+ */
 export function ordenarMovimentacoes(movs: readonly Movimentacao[], hojeDia: number): Movimentacao[] {
   return movs
     .filter((m) => diaDe(m.data) <= hojeDia)
-    .sort((a, b) => (a.data === b.data ? a.criado_em.localeCompare(b.criado_em) : a.data < b.data ? -1 : 1))
+    .sort(
+      (a, b) =>
+        a.data.localeCompare(b.data) ||
+        ORDEM_NO_DIA[a.tipo] - ORDEM_NO_DIA[b.tipo] ||
+        a.criado_em.localeCompare(b.criado_em) ||
+        a.id.localeCompare(b.id),
+    )
 }
 
 export function calcularLotes(produto: Produto, movs: readonly Movimentacao[]): SaldoLote[] {

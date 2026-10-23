@@ -1,16 +1,28 @@
 import { arred } from '../formatacao.ts'
-import { sugerirDuplicidades } from '../produtos.ts'
+import { chavePar, sugerirDuplicidades } from '../produtos.ts'
+import type { AnaliseProduto } from '../consumo.ts'
 import type { Detector } from './comum.ts'
 import { evidenciaBase } from './comum.ts'
 
+function cadastradoAntes(x: AnaliseProduto, y: AnaliseProduto): boolean {
+  const dx = x.primeiraMovimentacao ?? '9999-99-99'
+  const dy = y.primeiraMovimentacao ?? '9999-99-99'
+  return dx !== dy ? dx < dy : x.produto.nome_canonico.localeCompare(y.produto.nome_canonico) <= 0
+}
+
 /** Nomes normalizados semelhantes e mesmos números (R8). Só sugere: quem unifica é uma pessoa. */
-export const detectarPossivelDuplicidade: Detector = ({ analises, globais }) => {
+export const detectarPossivelDuplicidade: Detector = ({ analises, globais, paresDiferentes }) => {
   const porId = new Map(analises.map((a) => [a.produto.id, a]))
   return sugerirDuplicidades(
     analises.map((a) => a.produto),
     globais.duplicidade,
-  ).map(({ produtoA, produtoB, similaridade }) => {
-    // O alerta fica no produto cadastrado por último (o provável apelido).
+  )
+    // Par que uma pessoa já disse serem produtos diferentes: o alerta não volta.
+    .filter(({ produtoA, produtoB }) => !paresDiferentes.has(chavePar(produtoA.id, produtoB.id)))
+    .map(({ produtoA: p1, produtoB: p2, similaridade }) => {
+    // O alerta fica no produto que apareceu por último (o provável apelido): primeira movimentação
+    // mais recente; empate pelo nome. Não depende da ordem da lista de produtos.
+    const [produtoA, produtoB] = cadastradoAntes(porId.get(p1.id)!, porId.get(p2.id)!) ? [p1, p2] : [p2, p1]
     const a = porId.get(produtoB.id)!
     const outro = porId.get(produtoA.id)!
     const valores = [a.valorEstoque, outro.valorEstoque].filter((v) => v !== null)
