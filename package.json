@@ -7,8 +7,14 @@
     "web"
   ],
   "scripts": {
+    "build": "npm run build -w web",
     "test": "npm test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "gerar:simulados": "node data/simulados/gerar.ts"
+    "gerar:simulados": "node data/simulados/gerar.ts",
+    "dev": "npm run dev -w web",
+    "preview": "npm run preview -w web"
+  },
+  "engines": {
+    "node": ">=22.12"
   }
 }
