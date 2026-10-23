@@ -45,3 +45,14 @@ export function limiteUsado(a: AnaliseProduto, ...campos: CampoLimite[]): { orig
   const origemLimite = descreverOrigem(campos.map((c) => a.origemLimites[c]))
   return { origemLimite, regra: (texto) => `${texto.replace(/\.$/, '')} (${origemLimite}).` }
 }
+
+/**
+ * Reposição para `diasReposicao` dias de consumo (sem consumo: o que falta para o estoque mínimo).
+ * Mostrada na evidência de estoque crítico e ruptura; o valor é `null` sem preço (R2).
+ */
+export function evidenciaReposicao(a: AnaliseProduto): { diasReposicao: number; quantidadeReposicao: number; valorReposicao: number | null } {
+  const dias = a.limites.diasReposicao
+  const quantidade =
+    a.consumoDiario > 0 ? a.consumoDiario * dias : Math.max((a.produto.estoque_minimo ?? 0) - a.saldo, 0)
+  return { diasReposicao: dias, quantidadeReposicao: arred(quantidade), valorReposicao: valor(quantidade, a.precoMedio) }
+}

@@ -106,7 +106,7 @@ type Alerta = {
   produtoId: string;
   evidencia: Record<string, number | string | null>; // números que sustentam o alerta
   regra: string;               // critério que disparou, em linguagem simples
-  confianca: "alta" | "media" | "baixa" | "insuficiente";
+  confianca: "alta" | "media" | "baixa" | "insuficiente" | "fato";
   recomendacao: string;        // o que o responsável deve fazer
   mensagem: string;            // gerada a partir dos campos acima
   valorEnvolvido: number | null;
@@ -135,6 +135,9 @@ configuração (`web/src/analise/config.ts`), para calibração com o Victor:
 **Cobertura** = saldo ÷ consumo médio diário recente (janela padrão: 60 dias).
 **Confiança:** `insuficiente` < 3 saídas; `baixa` < 5 saídas ou histórico < 30 dias; `media` < 10 saídas; `alta` caso contrário.
 Com confiança `insuficiente`, não exibir número de dias: dizer que não há histórico suficiente.
+**Fato registrado:** `fato` é usado só em alertas que não são estimativa (lote vencido, possível
+duplicidade, devolução de embalagem, variação de preço e excesso sem consumo, que compara o saldo
+com o estoque mínimo). Nenhum alerta com estimativa de dias usa `fato`.
 
 ## 7. Stack e arquitetura
 

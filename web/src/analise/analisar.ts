@@ -2,7 +2,7 @@
 // não persiste nada. Chamar de novo com novas movimentações recalcula tudo (R6).
 import { CONFIG_PADRAO, chaveDoProduto, limitesPara } from './config.ts'
 import type { ConfigAnalise } from './config.ts'
-import { analisarProduto } from './consumo.ts'
+import { SEM_LOTE, analisarProduto } from './consumo.ts'
 import type { AnaliseProduto } from './consumo.ts'
 import { diaDeDate, isoDeDia } from './datas.ts'
 import { DETECTORES } from './detectores/index.ts'
@@ -25,6 +25,37 @@ export interface AvisoConfiguracao {
   mensagem: string
 }
 
+/** Problema na qualidade dos registros. Não é alerta de estoque: pede conferência dos dados. */
+export interface AvisoDados {
+  tipo: 'saldo_negativo'
+  produtoId: string
+  produto: string
+  /** Saldo total na unidade base (pode ser negativo). */
+  saldo: number
+  /** Lotes com saldo negativo ("sem lote" para retiradas sem lote que superaram os lotes). */
+  lotesNegativos: string[]
+  mensagem: string
+}
+
+export const MENSAGEM_SALDO_NEGATIVO =
+  'Saídas maiores que as entradas registradas — verificar se falta registrar alguma entrada'
+
+/** Produtos com saldo negativo (no total ou em algum lote): as saídas superam as entradas registradas. */
+export function verificarDados(analises: readonly AnaliseProduto[]): AvisoDados[] {
+  return analises.flatMap((a) => {
+    const lotesNegativos = a.lotes.filter((l) => l.saldo < 0).map((l) => (l.lote === SEM_LOTE ? 'sem lote' : l.lote))
+    if (a.saldo >= 0 && lotesNegativos.length === 0) return []
+    return [{
+      tipo: 'saldo_negativo' as const,
+      produtoId: a.produto.id,
+      produto: a.produto.nome_canonico,
+      saldo: Math.round(a.saldo * 1000) / 1000,
+      lotesNegativos,
+      mensagem: MENSAGEM_SALDO_NEGATIVO,
+    }]
+  })
+}
+
 export interface ResultadoAnalise {
   /** Data de referência da análise, `AAAA-MM-DD`. */
   data: string
@@ -36,6 +67,8 @@ export interface ResultadoAnalise {
   origens: Origem[]
   /** Ajustes da configuração que não estão sendo aplicados (ex.: nome de produto digitado errado). */
   avisosConfiguracao: AvisoConfiguracao[]
+  /** Problemas de qualidade dos registros (ex.: saldo negativo), separados dos alertas de estoque. */
+  avisosDados: AvisoDados[]
 }
 
 /** Chaves de `porProduto` que não correspondem a nenhum produto: o ajuste seria ignorado em silêncio. */
@@ -98,5 +131,6 @@ export function analisar(
     produtos: analises,
     origens,
     avisosConfiguracao: verificarConfiguracao(produtos, config),
+    avisosDados: verificarDados(analises),
   }
 }

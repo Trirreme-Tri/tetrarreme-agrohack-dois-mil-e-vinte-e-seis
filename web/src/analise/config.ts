@@ -42,7 +42,11 @@ export interface Limites {
     /** Piso do MAD, como fração da mediana (evita alerta quando todas as doses são iguais). */
     madMinimoFracaoMediana: number
   }
-  excesso: { coberturaMinimaDias: number }
+  excesso: {
+    coberturaMinimaDias: number
+    /** Sem consumo na janela: excesso se o saldo passar deste múltiplo do estoque mínimo. */
+    multiploEstoqueMinimoSemConsumo: number
+  }
   itemParado: { diasSemSaida: number }
   variacaoPreco: {
     variacaoMinima: number
@@ -110,7 +114,8 @@ export const CONFIG_PADRAO: ConfigAnalise = {
       janelaRecenteDias: 30,
       madMinimoFracaoMediana: 0.1,
     },
-    excesso: { coberturaMinimaDias: 180 },
+    // multiploEstoqueMinimoSemConsumo: PROVISÓRIO — calibrar com o Victor.
+    excesso: { coberturaMinimaDias: 180, multiploEstoqueMinimoSemConsumo: 10 },
     itemParado: { diasSemSaida: 60 },
     variacaoPreco: { variacaoMinima: 0.2, minimoComprasAnteriores: 2, janelaDias: 60 },
     // PROVISÓRIO — calibrar com o Victor. Prazo usual: até 1 ano da compra.

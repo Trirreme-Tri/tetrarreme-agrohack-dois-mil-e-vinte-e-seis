@@ -12,7 +12,7 @@
 - **Gerador:** `data/simulados/gerar.ts` — determinístico (semente fixa); `npm run gerar:simulados` na raiz.
 - **Data de referência da análise:** 20/10/2026.
 - **Período:** 21/10/2025 a 20/10/2026 (12 meses).
-- **Volume:** 2229 movimentações, 53 produtos, 8 categorias do Anexo III.
+- **Volume:** 2240 movimentações, 54 produtos, 8 categorias do Anexo III.
 - **Unidades misturadas de propósito (R1):** compras em t, sc 50 kg e L; retiradas em kg e mL.
 - **Dados ausentes de propósito (R2):** preço `N/D` em parte das compras de luva, preço `-` em todas
   as compras do conector, validade `-` ou vazia em fertilizantes, corretivos e peças.
@@ -24,7 +24,7 @@
 
 Todos os exemplos do Anexo III estão na base; os genéricos ("Herbicidas", "Filtros") foram
 especificados. Produtos fora desta tabela existem só para manter situações plantadas
-("UREIA 45%", "Herbicida glifozato 480").
+("Lâmina de roçadeira", "UREIA 45%", "Herbicida glifozato 480").
 
 | Categoria | Exemplo do Anexo III | Produto na base |
 |---|---|---|
@@ -96,11 +96,12 @@ exigem cada alerta, no nível indicado, analisando a base na data de referência
 | 6 | Retiradas mais frequentes no último mês (preparo de máquinas): 2,5 × o mês anterior | Graxa para rolamentos | consumo_crescente | atencao |
 | 7 | Dose semanal de ~250 mL e uma retirada de 2.500 mL em 12/10/2026 | Inseticida lambda-cialotrina | retirada_atipica | atencao |
 | 8 | Compra de 1.000 L para ~2 L/dia de consumo: saldo para mais de um ano | Óleo hidráulico | excesso | informativo |
-| 9 | Sobra da safra passada: 80 t (R$ 19.200) sem retirada desde 16/12/2025 | Calcário dolomítico | item_parado | informativo |
-| 10 | Última compra a R$ 4,10/kg, ~30% acima da média anterior (R$ 3,15/kg) | NPK 04-14-08 | variacao_preco | informativo |
-| 11 | Cadastrado à parte de "Ureia": mesmas palavras e sem números diferentes (R8) | UREIA 45% | possivel_duplicidade | atencao |
-| 12 | Erro de digitação de "Herbicida glifosato 480": uma letra diferente e o mesmo número (R8) | Herbicida glifozato 480 | possivel_duplicidade | atencao |
-| 13 | Primeiro lote (H24-2603) esgotado em julho; embalagem a devolver | Herbicida 2,4-D | devolucao_embalagem | informativo |
+| 9 | Sem retiradas desde março e 50 un em estoque, mais de 10 vezes o mínimo de 3 un (excesso sem consumo) | Lâmina de roçadeira | excesso | informativo |
+| 10 | Sobra da safra passada: 80 t (R$ 19.200) sem retirada desde 16/12/2025 | Calcário dolomítico | item_parado | informativo |
+| 11 | Última compra a R$ 4,10/kg, ~30% acima da média anterior (R$ 3,15/kg) | NPK 04-14-08 | variacao_preco | informativo |
+| 12 | Cadastrado à parte de "Ureia": mesmas palavras e sem números diferentes (R8) | UREIA 45% | possivel_duplicidade | atencao |
+| 13 | Erro de digitação de "Herbicida glifosato 480": uma letra diferente e o mesmo número (R8) | Herbicida glifozato 480 | possivel_duplicidade | atencao |
+| 14 | Primeiro lote (H24-2603) esgotado em julho; embalagem a devolver | Herbicida 2,4-D | devolucao_embalagem | informativo |
 
 ## Alertas secundários esperados
 

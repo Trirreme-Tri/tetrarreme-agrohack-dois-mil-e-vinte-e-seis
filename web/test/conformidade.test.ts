@@ -130,7 +130,7 @@ describe('R2 — ausência de validade ou preço não é zero', () => {
       mov({ produto_id: 'luva', tipo: 'entrada', quantidade: 10, unidade_id: 'un', data: '2026-10-01', preco_unit: 2 }),
     ]
     const r = analisar(movs, [p, q], HOJE)
-    expect(r.resumoFinanceiro.valorTotal).toBe(20)
+    expect(r.resumoFinanceiro.valorConhecido).toBe(20)
     expect(r.resumoFinanceiro.itensSemPreco).toBe(1)
     expect(r.produtos.find((a) => a.produto.id === 'conector')!.valorEstoque).toBeNull()
     expect(r.resumoFinanceiro.porProduto.find((x) => x.produtoId === 'conector')!.valor).toBeNull()

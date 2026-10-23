@@ -122,6 +122,10 @@ describe('Alerta (R4)', () => {
     expect(motivo(r)).toContain(`${campo}:`)
   })
 
+  test('aceita confiança "fato" (fato registrado, sem estimativa)', () => {
+    expect(AlertaSchema.safeParse({ ...alerta, confianca: 'fato' }).success).toBe(true)
+  })
+
   test('valor envolvido ausente é null, não zero', () => {
     const { valorEnvolvido: _, ...semValor } = alerta
     expect(AlertaSchema.safeParse(semValor).success).toBe(false)

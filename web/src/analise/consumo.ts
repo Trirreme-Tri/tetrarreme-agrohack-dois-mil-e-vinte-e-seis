@@ -1,7 +1,7 @@
 // Saldo por lote, consumo médio, cobertura e confiança (R3: calculada aqui, nunca armazenada).
 import type { CampoLimite, Limites, LimitesDoProduto, OrigemLimite } from './config.ts'
 import { diaDe } from './datas.ts'
-import type { Confianca, Movimentacao, Produto } from '@tetrarreme/contrato'
+import type { ConfiancaEstimativa, Movimentacao, Produto } from '@tetrarreme/contrato'
 import { converter } from './unidades.ts'
 
 const EPSILON = 1e-9
@@ -14,6 +14,8 @@ export interface SaldoLote {
   validade: string | null
   /** Preço médio por unidade base das entradas deste lote; `null` se nenhuma tinha preço. */
   precoUnitBase: number | null
+  /** Entradas deste lote que chegaram sem preço (o valor do lote usa preço médio). */
+  entradasSemPreco: number
   primeiraEntrada: string | null
   /** Data em que o saldo do lote chegou a zero (e continua zero). */
   zeradoEm: string | null
@@ -50,7 +52,8 @@ export interface AnaliseProduto {
    * da safra): nunca infinito. Sem cobertura, não há ruptura nem excesso; estoque crítico só pelo mínimo.
    */
   cobertura: number | null
-  confianca: Confianca
+  /** Confiança da estimativa de consumo (nunca `fato`: é sempre estimativa). */
+  confianca: ConfiancaEstimativa
   totalSaidas: number
   /** Saídas dentro da janela usada no consumo médio: é o que a confiança conta (R3). */
   saidasNaJanela: number
@@ -81,7 +84,7 @@ export function calcularConfianca(
   saidasNaJanela: number,
   diasHistorico: number,
   c: Limites['confianca'],
-): Confianca {
+): ConfiancaEstimativa {
   if (saidasNaJanela < c.saidasInsuficiente) return 'insuficiente'
   if (saidasNaJanela < c.saidasBaixa || diasHistorico < c.historicoMinimoDias) return 'baixa'
   if (saidasNaJanela < c.saidasMedia) return 'media'
@@ -110,7 +113,7 @@ export function calcularLotes(produto: Produto, movs: readonly Movimentacao[]): 
   const obter = (nome: string) => {
     let l = lotes.get(nome)
     if (!l) {
-      l = { lote: nome, saldo: 0, validade: null, precoUnitBase: null, primeiraEntrada: null, zeradoEm: null, qtdComPreco: 0, somaPreco: 0 }
+      l = { lote: nome, saldo: 0, validade: null, precoUnitBase: null, primeiraEntrada: null, zeradoEm: null, entradasSemPreco: 0, qtdComPreco: 0, somaPreco: 0 }
       lotes.set(nome, l)
     }
     return l
@@ -140,6 +143,7 @@ export function calcularLotes(produto: Produto, movs: readonly Movimentacao[]): 
       if (l.primeiraEntrada === null) l.primeiraEntrada = m.data
       if (l.validade === null && m.validade !== null) l.validade = m.validade
       const p = precoBase(m, produto)
+      if (m.tipo === 'entrada' && p === null) l.entradasSemPreco++
       if (m.tipo === 'entrada' && p !== null) {
         l.qtdComPreco += q
         l.somaPreco += p * q

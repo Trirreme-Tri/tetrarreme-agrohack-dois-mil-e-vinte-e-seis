@@ -33,7 +33,7 @@ export const detectarDevolucaoEmbalagem: Detector = ({ analises, hojeDia, globai
         regra: usado.regra(
           `Lote de defensivo esgotado; a embalagem vazia deve ser devolvida em até ${prazoDias} dias da compra. Atenção a partir de ${diasAtencao} dias do prazo; crítico a partir de ${diasCritico} dias.`,
         ),
-        confianca: 'alta' as const,
+        confianca: 'fato' as const,
         recomendacao: 'Fazer a tríplice lavagem e devolver as embalagens no posto de recebimento indicado na nota fiscal, se ainda não devolveu.',
         valorEnvolvido: null,
       }))

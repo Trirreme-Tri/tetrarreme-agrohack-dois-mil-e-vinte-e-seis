@@ -56,8 +56,15 @@ export type TipoAlerta = z.infer<typeof TipoAlertaSchema>
 export const NivelAlertaSchema = z.enum(['critico', 'atencao', 'informativo'])
 export type NivelAlerta = z.infer<typeof NivelAlertaSchema>
 
-/** R3: calculada na análise, nunca armazenada em registro. */
-export const ConfiancaSchema = z.enum(['alta', 'media', 'baixa', 'insuficiente'])
+/** R3: confiança de uma estimativa, calculada na análise e nunca armazenada em registro. */
+export const ConfiancaEstimativaSchema = z.enum(['alta', 'media', 'baixa', 'insuficiente'])
+export type ConfiancaEstimativa = z.infer<typeof ConfiancaEstimativaSchema>
+
+/**
+ * Confiança de um alerta: a de uma estimativa ou `fato` — fato registrado, sem estimativa
+ * (lote vencido, possível duplicidade, devolução de embalagem, variação de preço).
+ */
+export const ConfiancaSchema = z.enum([...ConfiancaEstimativaSchema.options, 'fato'])
 export type Confianca = z.infer<typeof ConfiancaSchema>
 
 // ------------------------------------------------------------------ tabelas

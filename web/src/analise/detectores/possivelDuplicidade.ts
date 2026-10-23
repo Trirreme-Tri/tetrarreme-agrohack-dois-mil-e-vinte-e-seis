@@ -28,7 +28,7 @@ export const detectarPossivelDuplicidade: Detector = ({ analises, globais }) => 
         origemLimite: 'critério global',
       },
       regra: 'Nomes parecidos e sem números diferentes de dosagem ou formulação (critério global).',
-      confianca: 'media' as const,
+      confianca: 'fato' as const,
       recomendacao: 'Verificar se é o mesmo produto. Se for, confirmar a unificação; enquanto isso, os saldos ficam separados.',
       valorEnvolvido: valores.length ? arred(valores.reduce((t, v) => t + v, 0)) : null,
     }

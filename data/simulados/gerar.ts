@@ -623,6 +623,17 @@ export function gerarBase(): BaseSimulada {
     plantar(p.nome, 'excesso', 'informativo', 'Compra de 1.000 L para ~2 L/dia de consumo: saldo para mais de um ano')
   }
 
+  // excesso sem consumo — cobertura nula (nenhuma retirada nos últimos 60 dias) e saldo maior que
+  // 10 × o estoque mínimo (Peças e manutenção: categoria sem limite sazonal).
+  // Como foi plantada: 60 lâminas compradas em dezembro de 2025 para a roçadeira, 10 usadas até
+  // março; a roçadeira foi trocada e as 50 restantes estão paradas, com mínimo de 3 un.
+  {
+    const p = produto('Lâmina de roçadeira', 'Peças e manutenção', 3)
+    p.compra('2025-12-01', 60, 'un', '25,00', 'Loja de Peças Delta')
+    p.retiradas('2025-12-10', '2026-03-12', 10, () => 1, 'un', ['Roçadeira'])
+    plantar(p.nome, 'excesso', 'informativo', 'Sem retiradas desde março e 50 un em estoque, mais de 10 vezes o mínimo de 3 un (excesso sem consumo)')
+  }
+
   // item_parado — valor no top 20% e sem saída há mais tempo que o limite (180 dias para corretivos).
   // Como foi plantada: 150 t compradas em novembro de 2025, 70 t aplicadas até 16/12/2025; sobram
   // 80 t (R$ 19.200) da safra passada, entre os maiores valores em estoque, sem retirada há ~300 dias.

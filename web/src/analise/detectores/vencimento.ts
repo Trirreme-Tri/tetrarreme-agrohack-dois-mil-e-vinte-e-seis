@@ -45,7 +45,7 @@ export const detectarVencimento: Detector = ({ analises, hojeDia }) =>
             ? 'Lote com validade vencida e ainda com saldo.'
             : 'Quantidade do lote maior que o consumo previsto até a validade, pelo consumo médio recente.',
         ),
-        confianca: vencido ? 'alta' : a.confianca,
+        confianca: vencido ? 'fato' : a.confianca,
         recomendacao: vencido
           ? 'Separar o lote vencido, não aplicar e verificar a destinação correta com o fornecedor.'
           : 'Usar este lote primeiro, avaliar remanejar para outra área ou negociar troca com o fornecedor.',
